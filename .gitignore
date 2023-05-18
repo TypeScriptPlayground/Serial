@@ -1,0 +1,5 @@
+#directories
+.vscode/
+.cache/
+build/
+test/
