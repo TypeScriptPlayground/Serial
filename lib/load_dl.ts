@@ -35,7 +35,7 @@ export function loadDL(os : string, path : string) {
         }
     }
 
-    return Deno.dlopen(`${path}.${libSuffix}`, {
+    return Deno.dlopen(`${path}/${os}.${libSuffix}`, {
         'open': {
             parameters: [
                 // Port
