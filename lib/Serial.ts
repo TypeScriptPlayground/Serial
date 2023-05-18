@@ -1,3 +1,5 @@
+import { loadDL } from "./load_dl.ts";
+
 export class Serial {
     private _port : string;
     private _baudrate : number;
@@ -13,7 +15,10 @@ export class Serial {
         this._baudrate = baudrate
         this._isOpen = false;
 
-        
+        loadDL(
+            Deno.build.os,
+            './dls/windows'
+        )
     }
 
     /**
