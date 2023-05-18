@@ -201,7 +201,12 @@ namespace WindowsSystem {
     * @param multiplieer The time multiplier between writing
     * @return Returns the current status code (negative) or number of bytes written
     */
-    auto write(void* buffer, const int bufferSize, const int timeout, const int multiplier) -> int {
+    auto write(
+        void* buffer,
+        const int bufferSize,
+        const int timeout,
+        const int multiplier
+    ) -> int {
         DWORD bytesWritten;
 
         timeouts.WriteTotalTimeoutConstant = timeout;
