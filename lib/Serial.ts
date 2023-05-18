@@ -1,4 +1,4 @@
-import { loadDL } from "./load_dl.ts";
+import { parety } from "./parity.ts";
 
 export class Serial {
     private _port : string;
@@ -14,11 +14,6 @@ export class Serial {
         this._port = port;
         this._baudrate = baudrate
         this._isOpen = false;
-
-        loadDL(
-            Deno.build.os,
-            './dls/windows'
-        )
     }
 
     /**
@@ -48,7 +43,11 @@ export class Serial {
     /**
      * Opens the serial connection.
      */
-    open() : void {
+    open(
+        dataBits : number,
+        parety : parety,
+        stopBits : number
+    ) : void {
         this._isOpen = true;
     }
 
@@ -56,6 +55,7 @@ export class Serial {
      * Closes the serial connection.
      */
     close() : void {
+        this._dl.close()
         this._isOpen = false;
     }
 
@@ -66,7 +66,11 @@ export class Serial {
      * @param {number} timeout The timeout in `ms`
      * @returns {Promise<string>} Returns number of bytes read
      */
-    read(buffer : Uint8Array, bytes : number, timeout? : number) : Promise<string> {
+    read(
+        buffer : Uint8Array,
+        bytes : number,
+        timeout? : number
+    ) : Promise<string> {
 
     }
 
@@ -77,7 +81,11 @@ export class Serial {
      * @param {number} timeout The timeout in `ms`
      * @returns {Promise<string>} Returns number of bytes read
      */
-    readUntil(buffer : Uint8Array, searchString : string, timeout? : number) : Promise<string> {
+    readUntil(
+        buffer : Uint8Array,
+        searchString : string,
+        timeout? : number
+    ) : Promise<string> {
 
     }
     /**
@@ -86,7 +94,10 @@ export class Serial {
      * @param {number} timeout The timeout in `ms`
      * @returns {Promise<string>} Returns number of bytes written
      */
-    write(data : string, timeout? : number) : Promise<void> {
+    write(
+        data : string,
+        timeout? : number
+    ) : Promise<void> {
 
     }
 
