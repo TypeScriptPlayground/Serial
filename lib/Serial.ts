@@ -1,24 +1,35 @@
-import { parety } from "./parity.ts";
+import { baudrate } from "./constants/baudrate.d.ts";
+import { dataBits } from "./constants/data_bits.d.ts";
+import { parity } from "./constants/parity.d.ts";
+import { stopBits } from "./constants/stop_bits.d.ts";
+import { SerialOptions } from "./serial_options.d.ts";
 
 export class Serial {
     private _port : string;
     private _baudrate : number;
     private _isOpen : boolean;
+    private _dataBits : typeof dataBits;
+    private _parity : typeof parity;
+    private _stopBits : typeof stopBits;
 
     /**
      * Create a new instance of a serial connection.
      * @param {string} port The port to connect
      * @param {number} baudrate The baudrate
+     * @param {SerialOptions} serialOptions 
      */
-    constructor(port : string, baudrate : number) {
+    constructor(port : string, baudrate : baudrate, serialOptions : SerialOptions) {
         this._port = port;
         this._baudrate = baudrate
+        this._dataBits = serialOptions.dataBits
+        this._parity = serialOptions.parity
+        this._stopBits = serialOptions.stopBits
         this._isOpen = false;
     }
 
     /**
      * Get the current port for the serial connection.
-     * @returns {string} Returns the port in a `string` formt
+     * @returns {string} Returns the port in a `string` format
      */
     get port() : string {
         return this._port;
@@ -43,11 +54,7 @@ export class Serial {
     /**
      * Opens the serial connection.
      */
-    open(
-        dataBits : number,
-        parety : parety,
-        stopBits : number
-    ) : void {
+    open() : void {
         this._isOpen = true;
     }
 
@@ -55,7 +62,6 @@ export class Serial {
      * Closes the serial connection.
      */
     close() : void {
-        this._dl.close()
         this._isOpen = false;
     }
 
