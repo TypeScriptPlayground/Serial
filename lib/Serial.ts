@@ -1,55 +1,23 @@
-import { baudrate } from "./constants/baudrate.ts";
+import { checkForErrorCode } from "./check_for_error_code.ts";
 import { dataBits } from "./constants/data_bits.ts";
 import { parity } from "./constants/parity.ts";
 import { stopBits } from "./constants/stop_bits.ts";
+import { decode } from "./decode.ts";
+import { Ports } from "./interfaces/ports.ts";
 import { SerialFunctions } from "./interfaces/serial_functions.d.ts";
 import { SerialOptions } from "./interfaces/serial_options.d.ts";
 import { loadDL } from "./load_dl.ts";
 
 export class Serial {
-    private _port : string;
-    private _baudrate : number;
-    private _dataBits : dataBits;
-    private _parity : parity;
-    private _stopBits : stopBits;
     private _isOpen : boolean;
     private _dl : SerialFunctions;
 
     /**
      * Create a new instance of a serial connection.
-     * @param {string} port The port to connect
-     * @param {number} baudrate The baudrate
-     * @param {SerialOptions} serialOptions Additional options for the serial connection (`data bits`, `parity`, `stop bits`)
      */
-    constructor(
-        port : string,
-        baudrate : baudrate,
-        serialOptions? : SerialOptions
-    ) {
-        this._port = port;
-        this._baudrate = baudrate;
-        this._dataBits = serialOptions?.dataBits || dataBits.EIGHT;
-        this._parity = serialOptions?.parity || parity.NONE;
-        this._stopBits = serialOptions?.stopBits || stopBits.ONE;
+    constructor() {
         this._isOpen = false;
-
-        this._dl = loadDL(Deno.build.os, './dls');
-    }
-
-    /**
-     * Get the current port for the serial connection.
-     * @returns {string} Returns the port in a `string` format
-     */
-    get port() : string {
-        return this._port;
-    }
-
-    /**
-     * Get the current port for the serial connection.
-     * @returns {string} Returns the baudrate
-     */
-    get baudrate() : number {
-        return this._baudrate;
+        this._dl = loadDL('./lib/dls', Deno.build.os);
     }
 
     /**
@@ -62,24 +30,41 @@ export class Serial {
 
     /**
      * Opens the serial connection.
+     * @param {string} port The port to connect
+     * @param {number} baudrate The baudrate
+     * @param {SerialOptions} serialOptions Additional options for the serial connection (`data bits`, `parity`, `stop bits`)
      */
-    open() : void {
-        this._dl.open(
-            this._port,
-            this._baudrate,
-            this._dataBits,
-            this._parity,
-            this._stopBits
+    open(
+        port : string,
+        baudrate : number,
+        serialOptions? : SerialOptions
+    ) : number {
+        const status = this._dl.open(
+            port,
+            baudrate,
+            serialOptions?.dataBits || dataBits.EIGHT,
+            serialOptions?.parity || parity.NONE,
+            serialOptions?.stopBits || stopBits.ONE
         );
+        
+        checkForErrorCode(status);
+
         this._isOpen = true;
+
+        return status;
     }
 
     /**
      * Closes the serial connection.
      */
-    close() : void {
-        this._dl.close();
+    close() : number {
+        const status = this._dl.close();
+
+        checkForErrorCode(status);
+
         this._isOpen = false;
+
+        return status;
     }
 
     /**
@@ -87,49 +72,102 @@ export class Serial {
      * @param {Uint8Array} buffer Buffer to read the bytes into
      * @param {number} bytes The number of bytes to read
      * @param {number} timeout The timeout in `ms`
-     * @returns {Promise<string>} Returns number of bytes read
+     * @param {number} multiplier The timeout between reading individual bytes in `ms`
+     * @returns {number} Returns number of bytes read
      */
     read(
         buffer : Uint8Array,
         bytes : number,
-        timeout? : number
-    ) : Promise<string> {
+        timeout = 0,
+        multiplier = 10
+    ) : number {
+        const status = this._dl.read(
+            buffer,
+            bytes,
+            timeout,
+            multiplier
+        );
+        
+        checkForErrorCode(status);
 
+        return status;
     }
 
     /**
      * Read data from serial connection until a linebreak (`\n`) gets send.
      * @param {Uint8Array} buffer Buffer to read the bytes into
-     * @param {string} searchString A string to search for
+     * @param {number} bytes The number of bytes to read
      * @param {number} timeout The timeout in `ms`
-     * @returns {Promise<string>} Returns number of bytes read
+     * @param {number} multiplier The timeout between reading individual bytes in `ms`
+     * @param {string} searchString A string to search for
+     * @returns {number} Returns number of bytes read
      */
     readUntil(
         buffer : Uint8Array,
-        searchString : string,
-        timeout? : number
-    ) : Promise<string> {
+        bytes : number,
+        timeout = 0,
+        multiplier = 10,
+        searchString = '',
+    ) : number {
+        const status = this._dl.readUntil(
+            buffer,
+            bytes,
+            timeout,
+            multiplier,
+            searchString
+        )
 
+        checkForErrorCode(status);
+
+        return status
     }
     /**
      * Write data to serial connection.
-     * @param {string} data The data to write/send
+     * @param {Uint8Array} buffer The data to write/send
+     * @param {number} bytes The number of bytes to read
      * @param {number} timeout The timeout in `ms`
-     * @returns {Promise<string>} Returns number of bytes written
+     * @param {number} multiplier The timeout between reading individual bytes in `ms`
+     * @returns {number} Returns number of bytes written
      */
     write(
-        data : string,
-        timeout? : number
-    ) : Promise<void> {
+        buffer : Uint8Array,
+        bytes : number,
+        timeout = 0,
+        multiplier = 10
+    ) : number {
+        const status = this._dl.write(
+            buffer,
+            bytes,
+            timeout,
+            multiplier
+        )
+        
+        checkForErrorCode(status);
 
+        return status
     }
 
     /**
      * Gat a list of the available ports.
-     * @returns {Promise<string>} Returns a list of available ports
+     * @returns {Ports[]} Returns a list of available ports
      */
-    getPorts() : Promise<Ports[]> {
+    getAvailablePorts() : Ports[] {
+        const buffer = new Uint8Array(1024);
+        const status = this._dl.getAvailablePorts(
+            buffer,
+            buffer.length,
+            ','
+        )
+        
+        checkForErrorCode(status);
 
+        const ports = decode(buffer).replaceAll('\x00','').split(',').map((port) => {
+            return {
+                name: port
+            };
+        })
+
+        return ports;
     }
 }
 

@@ -103,47 +103,47 @@ export function registerSerialFunctions(
         ),
         close: () : number => serialFunctions.close(),
         read: (
-            buffer : string,
-            bufferSize : number,
+            buffer : Uint8Array,
+            bytes : number,
             timeout : number,
             multiplier : number
         ) : number => serialFunctions.read(
-            encode(buffer + '\0'),
-            bufferSize,
+            buffer,
+            bytes,
             timeout,
             multiplier
         ),
         readUntil: (
-            buffer : string,
-            bufferSize : number,
+            buffer : Uint8Array,
+            bytes : number,
             timeout : number,
             multiplier : number,
             searchString : string
         ) : number => serialFunctions.readUntil(
-            encode(buffer + '\0'),
-            bufferSize,
+            buffer,
+            bytes,
             timeout,
             multiplier,
             encode(searchString + '\0')
         ),
         write: (
-            buffer : string,
-            bufferSize : number,
+            buffer : Uint8Array,
+            bytes : number,
             timeout : number,
             multiplier : number
         ) : number => serialFunctions.write(
-            encode(buffer + '\0'),
-            bufferSize,
+            buffer,
+            bytes,
             timeout,
             multiplier
         ),
         getAvailablePorts: (
-            buffer : string,
-            bufferSize : number,
+            buffer : Uint8Array,
+            bytes : number,
             separator : string
         ) : number => serialFunctions.getAvailablePorts(
-            encode(buffer + '\0'),
-            bufferSize,
+            buffer,
+            bytes,
             encode(separator + '\0')
         )
     }

@@ -35,6 +35,6 @@ export function loadDL(path : string, os : string) : SerialFunctions {
             break;
         }
     }
-
+    
     return registerSerialFunctions(path, os, libSuffix);
 }

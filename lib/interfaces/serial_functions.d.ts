@@ -10,26 +10,26 @@ export interface SerialFunctions {
     ) => number,
     close: () => number,
     read: (
-        buffer : string,
+        buffer : Uint8Array,
         bufferSize : number,
         timeout : number,
         multiplier : number
     ) => number,
     readUntil: (
-        buffer : string,
+        buffer : Uint8Array,
         bufferSize : number,
         timeout : number,
         multiplier : number,
         searchString : string
     ) => number,
     write: (
-        buffer : string,
+        buffer : Uint8Array,
         bufferSize : number,
         timeout : number,
         multiplier : number
     ) => number,
     getAvailablePorts: (
-        buffer : string,
+        buffer : Uint8Array,
         bufferSize : number,
         separator : string
     ) => number

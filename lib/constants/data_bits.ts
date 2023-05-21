@@ -1,6 +1,13 @@
-export const enum dataBits {
-    FIVE = 0,
-    SIX = 1,
-    SEVEN = 2,
-    EIGHT = 3,
+interface DataBits {
+    FIVE: 5,
+    SIX: 6,
+    SEVEN: 7,
+    EIGHT: 8,
+}
+
+export const dataBits : DataBits = {
+    FIVE: 5,
+    SIX: 6,
+    SEVEN: 7,
+    EIGHT: 8,
 }
