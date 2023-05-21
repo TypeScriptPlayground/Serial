@@ -29,3 +29,25 @@ console.log('reading:', new TextDecoder().decode(dataToRead));
 
 console.log('serial.close()', serial.close());
 ```
+Arduino:
+```ino
+char incomingBytes[10];
+
+int charsRead = 0;
+
+void setup() {
+  Serial.begin(9600);
+  while (!Serial) {
+    ;
+  }
+}
+
+void loop() {
+  int available = Serial.available();
+  if (available > 0) {
+    charsRead = Serial.readBytes(incomingBytes, available);
+
+    Serial.print(incomingBytes);
+  }
+}
+```
