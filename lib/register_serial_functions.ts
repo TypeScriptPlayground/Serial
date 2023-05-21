@@ -1,13 +1,13 @@
-import { DynamicLibraryFunctions } from "./dynamic_library_functions.ts";
+import { SerialFunctions } from "./interfaces/serial_functions.d.ts";
 import { encode } from "./encode.ts";
-import { parety } from "./parity.ts";
+import { parity } from "./constants/parity.ts";
 
-export function openDL(
+export function registerSerialFunctions(
     path : string,
     os : string,
     libSuffix : string
-) : DynamicLibraryFunctions {
-    const dlFunctions = Deno.dlopen(`${path}/${os}.${libSuffix}`, {
+) : SerialFunctions {
+    const serialFunctions = Deno.dlopen(`${path}/${os}.${libSuffix}`, {
         'open': {
             parameters: [
                 // Port
@@ -92,22 +92,22 @@ export function openDL(
             port : string,
             baudrate : number,
             dataBits : number,
-            parity : parety,
+            parity : parity,
             stopBits : number
-        ) : number => dlFunctions.open(
+        ) : number => serialFunctions.open(
             encode(port + '\0'),
             baudrate,
             dataBits,
             parity,
             stopBits
         ),
-        close: () : number => dlFunctions.close(),
+        close: () : number => serialFunctions.close(),
         read: (
             buffer : string,
             bufferSize : number,
             timeout : number,
             multiplier : number
-        ) : number => dlFunctions.read(
+        ) : number => serialFunctions.read(
             encode(buffer + '\0'),
             bufferSize,
             timeout,
@@ -119,7 +119,7 @@ export function openDL(
             timeout : number,
             multiplier : number,
             searchString : string
-        ) : number => dlFunctions.readUntil(
+        ) : number => serialFunctions.readUntil(
             encode(buffer + '\0'),
             bufferSize,
             timeout,
@@ -131,7 +131,7 @@ export function openDL(
             bufferSize : number,
             timeout : number,
             multiplier : number
-        ) : number => dlFunctions.write(
+        ) : number => serialFunctions.write(
             encode(buffer + '\0'),
             bufferSize,
             timeout,
@@ -141,7 +141,7 @@ export function openDL(
             buffer : string,
             bufferSize : number,
             separator : string
-        ) : number => dlFunctions.getAvailablePorts(
+        ) : number => serialFunctions.getAvailablePorts(
             encode(buffer + '\0'),
             bufferSize,
             encode(separator + '\0')

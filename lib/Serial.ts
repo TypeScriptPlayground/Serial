@@ -1,30 +1,39 @@
-import { baudrate } from "./constants/baudrate.d.ts";
-import { dataBits } from "./constants/data_bits.d.ts";
-import { parity } from "./constants/parity.d.ts";
-import { stopBits } from "./constants/stop_bits.d.ts";
-import { SerialOptions } from "./serial_options.d.ts";
+import { baudrate } from "./constants/baudrate.ts";
+import { dataBits } from "./constants/data_bits.ts";
+import { parity } from "./constants/parity.ts";
+import { stopBits } from "./constants/stop_bits.ts";
+import { SerialFunctions } from "./interfaces/serial_functions.d.ts";
+import { SerialOptions } from "./interfaces/serial_options.d.ts";
+import { loadDL } from "./load_dl.ts";
 
 export class Serial {
     private _port : string;
     private _baudrate : number;
+    private _dataBits : dataBits;
+    private _parity : parity;
+    private _stopBits : stopBits;
     private _isOpen : boolean;
-    private _dataBits : typeof dataBits;
-    private _parity : typeof parity;
-    private _stopBits : typeof stopBits;
+    private _dl : SerialFunctions;
 
     /**
      * Create a new instance of a serial connection.
      * @param {string} port The port to connect
      * @param {number} baudrate The baudrate
-     * @param {SerialOptions} serialOptions 
+     * @param {SerialOptions} serialOptions Additional options for the serial connection (`data bits`, `parity`, `stop bits`)
      */
-    constructor(port : string, baudrate : baudrate, serialOptions : SerialOptions) {
+    constructor(
+        port : string,
+        baudrate : baudrate,
+        serialOptions? : SerialOptions
+    ) {
         this._port = port;
-        this._baudrate = baudrate
-        this._dataBits = serialOptions.dataBits
-        this._parity = serialOptions.parity
-        this._stopBits = serialOptions.stopBits
+        this._baudrate = baudrate;
+        this._dataBits = serialOptions?.dataBits || dataBits.EIGHT;
+        this._parity = serialOptions?.parity || parity.NONE;
+        this._stopBits = serialOptions?.stopBits || stopBits.ONE;
         this._isOpen = false;
+
+        this._dl = loadDL(Deno.build.os, './dls');
     }
 
     /**
@@ -55,6 +64,13 @@ export class Serial {
      * Opens the serial connection.
      */
     open() : void {
+        this._dl.open(
+            this._port,
+            this._baudrate,
+            this._dataBits,
+            this._parity,
+            this._stopBits
+        );
         this._isOpen = true;
     }
 
@@ -62,6 +78,7 @@ export class Serial {
      * Closes the serial connection.
      */
     close() : void {
+        this._dl.close();
         this._isOpen = false;
     }
 

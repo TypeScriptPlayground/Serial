@@ -1,7 +1,7 @@
-import { DynamicLibraryFunctions } from "./dynamic_library_functions.ts";
-import { openDL } from "./open_dl.ts";
+import { SerialFunctions } from "./interfaces/serial_functions.d.ts";
+import { registerSerialFunctions } from "./register_serial_functions.ts";
 
-export function loadDL(os : string, path : string) : DynamicLibraryFunctions {
+export function loadDL(path : string, os : string) : SerialFunctions {
     let libSuffix = '';
 
     switch(os) {
@@ -36,5 +36,5 @@ export function loadDL(os : string, path : string) : DynamicLibraryFunctions {
         }
     }
 
-    return openDL(path, os, libSuffix);
+    return registerSerialFunctions(path, os, libSuffix);
 }

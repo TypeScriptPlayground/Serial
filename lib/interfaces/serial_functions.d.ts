@@ -1,11 +1,11 @@
-import { parety } from "./parity.ts";
+import { parity } from "../constants/parity.ts";
 
-export interface DynamicLibraryFunctions {
+export interface SerialFunctions {
     open: (
         port : string,
         baudrate : number,
         dataBits : number,
-        parity : parety,
+        parity : parity,
         stopBits : number
     ) => number,
     close: () => number,
