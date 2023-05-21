@@ -30,15 +30,17 @@ export class Serial {
 
     /**
      * Opens the serial connection.
-     * @param {string} port The port to connect
+     * @param {string|Ports} port The port to connect
      * @param {number} baudrate The baudrate
      * @param {SerialOptions} serialOptions Additional options for the serial connection (`data bits`, `parity`, `stop bits`)
      */
     open(
-        port : string,
+        port : string | Ports,
         baudrate : number,
         serialOptions? : SerialOptions
     ) : number {
+        // It's just the ports name that is interesting to us
+        if(typeof port != "string") port = port.name;
         const status = this._dl.open(
             port,
             baudrate,
