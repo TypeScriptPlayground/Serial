@@ -148,7 +148,9 @@ write(
 <br>
 
 ### Examples
-...
+
+WIP
+
 ```typescript
 import { Serial, baudrate } from "./mod.ts";
 
