@@ -1,38 +1,42 @@
 #pragma once
 
-#ifdef SERIALPORT_EXPORTS
-/*Enabled as "export" while compiling the dll project*/
-#define DLL_IMPORT_EXPORT __declspec(dllexport)
+#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+#   ifdef SERIALPORT_EXPORTS
+#       define MODULE_API __declspec(dllexport)
+#   else
+#       define MODULE_API __declspec(dllimport)
+#   endif
 #else
-/*Enabled as "import" in the Client side for using already created dll file*/
-#define DLL_IMPORT_EXPORT __declspec(dllimport)
+#   define MODULE_API
 #endif
 
 // Windows
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
-    #include "serial_windows.h"
-    #define _open(port, baudrate, dataBits, parity, stopBits) WindowsSystem::open(port, baudrate, dataBits, parity, stopBits)
-    #define _close() WindowsSystem::close()
-    #define _read(buffer, bufferSize, timeout, multiplier) WindowsSystem::read(buffer, bufferSize, timeout, multiplier)
-    #define _readUntil(buffer, bufferSize, timeout, multiplier, untilChar) WindowsSystem::readUntil(buffer, bufferSize, timeout, multiplier, untilChar)
-    #define _write(buffer, bufferSize, timeout, multiplier) WindowsSystem::write(buffer, bufferSize, timeout, multiplier)
-    #define _getAvailablePorts(buffer, bufferSize, separator) WindowsSystem::getAvailablePorts(buffer, bufferSize, separator)
+#   include "serial_windows.h"
+#   define systemOpen(port, baudrate, dataBits, parity, stopBits) windowsSystemOpen(port, baudrate, dataBits, parity, stopBits)
+#   define systemClose() windowsSystemClose()
+#   define systemRead(buffer, bufferSize, timeout, multiplier) windowsSystemRead(buffer, bufferSize, timeout, multiplier)
+#   define systemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar) windowsSystemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar)
+#   define systemWrite(buffer, bufferSize, timeout, multiplier) windowsSystemWrite(buffer, bufferSize, timeout, multiplier)
+#   define systemGetAvailablePorts(buffer, bufferSize, separator) windowsSystemGetAvailablePorts(buffer, bufferSize, separator)
 #endif
 
 // Linux, Apple
 #if defined(__unix__) || defined(__unix) || defined(__APPLE__)
-    #include "serial_unix.h"
-    #define _open(port, baudrate, dataBits, parity, stopBits) UnixSystemOopen(port, baudrate, dataBits, parity, stopBits)
-    #define _close() UnixSystemClose()
-    #define _read(buffer, bufferSize, timeout, multiplier) UnixSystemRead(buffer, bufferSize, timeout, multiplier)
-    #define _readUntil(buffer, bufferSize, timeout, multiplier, untilChar) UnixSystemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar)
-    #define _write(buffer, bufferSize, timeout, multiplier) UnixSystemWrite(buffer, bufferSize, timeout, multiplier)
-    // #define _getAvailablePorts() UnixSystemGetAvailablePorts()
+#   include "serial_unix.h"
+#   define systemOpen(port, baudrate, dataBits, parity, stopBits) unixSystemOpen(port, baudrate, dataBits, parity, stopBits)
+#   define systemClose() unixSystemClose()
+#   define systemRead(buffer, bufferSize, timeout, multiplier) unixSystemRead(buffer, bufferSize, timeout, multiplier)
+#   define systemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar) unixSystemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar)
+#   define systemWrite(buffer, bufferSize, timeout, multiplier) unixSystemWrite(buffer, bufferSize, timeout, multiplier)
+#   define systemGetAvailablePorts(buffer, bufferSize, separator) unixSystemGetAvailablePorts(buffer, bufferSize, separator)
 #endif
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 
-    DLL_IMPORT_EXPORT auto open(
+    MODULE_API auto serialOpen(
         void* port,
         const int baudrate,
         const int dataBits,
@@ -40,16 +44,16 @@ extern "C" {
         const int stopBits = 0
     ) -> int;
 
-    DLL_IMPORT_EXPORT auto close() -> int;
+    MODULE_API auto serialClose() -> int;
 
-    DLL_IMPORT_EXPORT auto read(
+    MODULE_API auto serialRead(
         void* buffer,
         const int bufferSize,
         const int timeout,
         const int multiplier
     ) -> int;
 
-    DLL_IMPORT_EXPORT auto readUntil(
+    MODULE_API auto serialReadUntil(
         void* buffer,
         const int bufferSize,
         const int timeout,
@@ -57,17 +61,19 @@ extern "C" {
         void* untilChar
     ) -> int;
 
-    DLL_IMPORT_EXPORT auto write(
+    MODULE_API auto serialWrite(
         void* buffer,
         const int bufferSize,
         const int timeout,
         const int multiplier
     ) -> int;
 
-    DLL_IMPORT_EXPORT auto getAvailablePorts(
+    MODULE_API auto serialGetAvailablePorts(
         void* buffer,
         const int bufferSize,
         void* separator
     ) -> int;
 
+#ifdef __cplusplus
 }
+#endif

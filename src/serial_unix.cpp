@@ -1,7 +1,7 @@
 #if defined(__unix__) || defined(__unix) || defined(__APPLE__)
 #include "serial_unix.h"
 
-namespace fs = std::filesystem;
+// namespace fs = std::filesystem;
 
 int hSerialPort;
 termios2 tty;
@@ -18,7 +18,7 @@ auto unixSystemOpen(
     hSerialPort = open(portName, O_RDWR);
     
     // Error if open fails
-    ioctl(hSerialPort, TCGETS2, &tty)
+    ioctl(hSerialPort, TCGETS2, &tty);
     // if (tcgetattr(hSerialPort, &tty) != 0) {
     //     returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
     // }
@@ -81,9 +81,6 @@ auto unixSystemOpen(
             tty.c_cflag     |=   PARENB;
             tty.c_cflag		|=	 PARODD;
             break;
-        default:
-            THROW_EXCEPT("parity_ value not supported!");
-
     }
 
     // stop bits
@@ -96,16 +93,16 @@ auto unixSystemOpen(
         case 2:
             tty.c_cflag     |=  CSTOPB;
             break;
-        default:
-            THROW_EXCEPT("numStopBits_ value not supported!");
     }
 
     // Save tty settings, also checking for error
     ioctl(hSerialPort, TCSETS2, &tty);
+
+    returnStatus(StatusCodes::SUCCESS);
 }
 
 auto unixSystemClose() -> int {
-    close(hSerialPort);
+    return close(hSerialPort);
 }
 
 auto unixSystemRead(
@@ -124,7 +121,7 @@ auto unixSystemReadUntil(
     const int multiplier,
     void* searchString
 ) -> int {
-
+    return 0;
 }
 
 auto unixSystemWrite(
@@ -133,44 +130,47 @@ auto unixSystemWrite(
     const int timeout,
     const int multiplier
 ) -> int {
-    return write(serial_port, static_cast<char*>(buffer), bufferSize);
+
+    std::string tmp(static_cast<char*>(buffer), bufferSize);
+
+    return write(hSerialPort, tmp.c_str(), tmp.length() + 1);
 }
 
-auto unixSystemGetAvailablePorts(
-    void* buffer,
-    const int bufferSize,
-    void* separator
-) -> int {
-    std::string result;
+// auto unixSystemGetAvailablePorts(
+//     void* buffer,
+//     const int bufferSize,
+//     void* separator
+// ) -> int {
+//     std::string result;
 
-    int portsCounter = 0;
+//     int portsCounter = 0;
 
-    fs::path p("/dev/serial/by-id");
+//     fs::path p("/dev/serial/by-id");
     
-    try {
-        if (!exists(p)) {
-            returnStatus(StatusCodes::NOT_FOUND_ERROR);
-        }
+//     try {
+//         if (!exists(p)) {
+//             returnStatus(StatusCodes::NOT_FOUND_ERROR);
+//         }
         
-        else {
-            for (auto de : fs::directory_iterator(p)) {
-                if (is_symlink(de.symlink_status())) {
-                    fs::path symlink_points_at = read_symlink(de);
-                    fs::path canonical_path = fs::canonical(p / symlink_points_at);
-                    result += canonical_path.generic_string().append(std::string(static_cast<char*>(separator)));
-                    portsCounter++;
-                }
-            }
-        }
-    } catch (const fs::filesystem_error &exeption) {
-    }
+//         else {
+//             for (auto de : fs::directory_iterator(p)) {
+//                 if (is_symlink(de.symlink_status())) {
+//                     fs::path symlink_points_at = read_symlink(de);
+//                     fs::path canonical_path = fs::canonical(p / symlink_points_at);
+//                     result += canonical_path.generic_string().append(std::string(static_cast<char*>(separator)));
+//                     portsCounter++;
+//                 }
+//             }
+//         }
+//     } catch (const fs::filesystem_error &exeption) {
+//     }
 
-    if (result.length() + 1 <= bufferSize){
-        memcpy(buffer, result.c_str(), result.length() + 1);
-    } else {
-        returnStatus(StatusCodes::BUFFER_ERROR);
-    }
-    return portsCounter;
-}
+//     if (result.length() + 1 <= bufferSize){
+//         memcpy(buffer, result.c_str(), result.length() + 1);
+//     } else {
+//         returnStatus(StatusCodes::BUFFER_ERROR);
+//     }
+//     return portsCounter;
+// }
 
 #endif

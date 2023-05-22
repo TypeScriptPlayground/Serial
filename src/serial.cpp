@@ -1,51 +1,51 @@
 #include "serial.h"
 
-auto open(
+auto serialOpen(
     void* port,
     const int baudrate,
     const int dataBits,
     const int parity,
     const int stopBits
 ) -> int {
-    return _open(port, baudrate, dataBits, parity, stopBits);
+    return systemOpen(port, baudrate, dataBits, parity, stopBits);
 }
 
-auto close() -> int {
-    return _close();
+auto serialClose() -> int {
+    return systemClose();
 }
 
-auto read(
+auto serialRead(
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier
 ) -> int {
-    return _read(buffer, bufferSize, timeout, multiplier);
+    return systemRead(buffer, bufferSize, timeout, multiplier);
 }
 
-auto readUntil(
+auto serialReadUntil(
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier,
     void* untilChar
 ) -> int {
-    return _readUntil(buffer, bufferSize, timeout, multiplier, untilChar);
+    return systemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar);
 }
 
-auto write(
+auto serialWrite(
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier
 ) -> int {
-    return _write(buffer, bufferSize, timeout, multiplier);
+    return systemWrite(buffer, bufferSize, timeout, multiplier);
 }
 
-auto getAvailablePorts(
+auto serialGetAvailablePorts(
     void* buffer,
     const int bufferSize,
     void* separator
 ) -> int {
-    return _getAvailablePorts(buffer, bufferSize, separator);
+    return systemGetAvailablePorts(buffer, bufferSize, separator);
 }
