@@ -22,6 +22,12 @@ jobs:
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Archive artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Compiled-Binary
+        path: ${{github.workspace}}/lib/dls/
     
   windows_build:
     runs-on: windows-latest
@@ -35,6 +41,12 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       
+    - name: Archive artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Compiled-Binary
+        path: ${{github.workspace}}/lib/dls/
+      
   macos_build:
     runs-on: macos-latest
     
@@ -46,4 +58,10 @@ jobs:
       
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+    
+    - name: Archive artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Compiled-Binary
+        path: ${{github.workspace}}/lib/dls/
 
