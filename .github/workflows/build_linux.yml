@@ -3,9 +3,9 @@ name: Build Linux SO
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - 'include/**'
-      - 'src/**'
+    # paths:
+    #   - 'include/**'
+    #   - 'src/**'
   pull_request:
     branches: [ "main" ]
     paths:
