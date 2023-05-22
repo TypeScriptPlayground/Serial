@@ -6,13 +6,11 @@
 #include <windows.h>
 #include "status_codes.h"
 
-namespace WindowsSystem {
-
 extern HANDLE hSerialPort;
 extern DCB dcbSerialParams;
 extern COMMTIMEOUTS timeouts;
 
-auto open(
+auto windowsSystemOpen(
     void* port,
     const int baudrate,
     const int dataBits,
@@ -20,16 +18,16 @@ auto open(
     const int stopBits = 0
 ) -> int;
 
-auto close() -> int;
+auto windowsSystemClose() -> int;
 
-auto read(
+auto windowsSystemRead(
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier
 ) -> int;
 
-auto readUntil(
+auto windowsSystemReadUntil(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -37,19 +35,17 @@ auto readUntil(
     void* untilChar
 ) -> int;
 
-auto write(
+auto windowsSystemWrite(
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier
 ) -> int;
 
-auto getAvailablePorts(
+auto windowsSystemGetAvailablePorts(
     void* buffer,
     const int bufferSize,
     void* separator
 ) -> int;
-
-}
 
 #endif
