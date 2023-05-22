@@ -151,7 +151,7 @@ export class Serial {
      * Gat a list of the available ports.
      * @returns {Ports[]} Returns a list of available ports
      */
-    getAvailablePorts() : Ports[] {
+    getPortsInfo() : Ports[] {
         const buffer = new Uint8Array(1024);
         const status = this._dl.getAvailablePorts(
             buffer,
