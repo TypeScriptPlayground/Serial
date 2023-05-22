@@ -41,6 +41,9 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       
+    - name: Move compiled file
+      run: move ${{github.workspace}}\build\Release\serialport.dll ${{github.workspace}}\lib\dls\
+      
     - name: Archive artifact
       uses: actions/upload-artifact@v2
       with:
