@@ -1,5 +1,5 @@
 #pragma once
-
+// test
 #ifdef SERIALPORT_EXPORTS
 /*Enabled as "export" while compiling the dll project*/
 #define DLL_IMPORT_EXPORT __declspec(dllexport)
