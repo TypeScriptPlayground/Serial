@@ -1,4 +1,4 @@
-name: Build Windows-latest
+name: Build Win32 DLL
 
 on:
   push:
