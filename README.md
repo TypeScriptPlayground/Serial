@@ -31,6 +31,13 @@ A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most
 - [ ] MacOS (planned)
 
 ### Usage
+#### `class` Serial
+##### `methode` open()
+##### `methode` close()
+##### `methode` read()
+##### `methode` readUntil()
+##### `methode` write()
+##### `getter property` isOpen
 ...
 ```typescript
 import { Serial, baudrate } from "./mod.ts";
