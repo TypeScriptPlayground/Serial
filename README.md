@@ -30,6 +30,11 @@ A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most
 - [ ] Linux (in progress)
 - [ ] MacOS (planned)
 
+### Possible/Known issues
+- What happens if you open multiple connections from the same instance.
+- Every function returns the status code although it is previously checked.
+- 
+
 ### Usage
 #### `class` Serial
 ```typescript
