@@ -38,7 +38,8 @@ A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most
  */
 new Serial()
 ```
-----
+
+<br>
 
 #### `getter property` Serial.isOpen
 ```typescript
@@ -49,7 +50,7 @@ new Serial()
 get isOpen() : boolean
 ```
 
-----
+<br>
 
 #### `methode` Serial.open()
 ```typescript
@@ -67,7 +68,7 @@ open(
 ) : number
 ```
 
-----
+<br>
 
 #### `methode` Serial.close()
 ```typescript
@@ -77,7 +78,7 @@ open(
 close() : number
 ```
 
-----
+<br>
 
 #### `methode` Serial.read()
 ```typescript
@@ -97,7 +98,7 @@ read(
 ) : number
 ```
 
-----
+<br>
 
 #### `methode` Serial.readUntil()
 ```typescript
@@ -119,7 +120,7 @@ readUntil(
 ) : number
 ```
 
-----
+<br>
 
 #### `methode` Serial.write()
 ```typescript
@@ -139,7 +140,7 @@ write(
 ) : number
 ```
 
-----
+<br>
 
 ### Examples
 ...
