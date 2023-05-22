@@ -1,5 +1,21 @@
 # Serial
-A serial device library written in TypeScript for Deno without third party libraries.
+<img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain">
+
+A serial device library written in TypeScript for [Deno](https://deno.land) without third party libraries.
+
+This library provides an interface for the communication with serial devices. The library works without any third party modules.
+
+### Features
+- Communication with serial devices.
+- Create multiple serial connections at the same time.
+- List available ports and their properties.
+- Uses no third party modules.
+- Works on different operating systems (check [compatibility](#compatibility) for mor info).
+
+### Compatibility
+- [x] Windows
+- [ ] Linux
+- [ ] MacOS
 
 ```typescript
 import { Serial, baudrate } from "./mod.ts";
