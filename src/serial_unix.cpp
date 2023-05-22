@@ -51,19 +51,19 @@ auto unixSystemOpen(
 
 
     // Data bits
-    tty.c_cflag     &=  ~CSIZE;			// CSIZE is a mask for the number of bits per character
+    tty.c_cflag &=  ~CSIZE;			// CSIZE is a mask for the number of bits per character
     switch(dataBits) {
         case 5:
-            tty.c_cflag     |=  CS5;
+            tty.c_cflag |= CS5;
             break;
         case 6:
-            tty.c_cflag     |=  CS6;
+            tty.c_cflag |= CS6;
             break;
         case 7:
-            tty.c_cflag     |=  CS7;
+            tty.c_cflag |= CS7;
             break;
         default:
-            tty.c_cflag     |=  CS8;
+            tty.c_cflag |= CS8;
             break;
     }
 
@@ -71,15 +71,15 @@ auto unixSystemOpen(
     // parity
     switch(parity) {
         case 0:
-            tty.c_cflag     &=  ~PARENB;
+            tty.c_cflag &= ~PARENB;
             break;
         case 1:	
-            tty.c_cflag 	|=   PARENB;
-            tty.c_cflag		&=	 ~PARODD; // Clearing PARODD makes the parity even
+            tty.c_cflag |= PARENB;
+            tty.c_cflag &= ~PARODD; // Clearing PARODD makes the parity even
             break;
         case 2:
-            tty.c_cflag     |=   PARENB;
-            tty.c_cflag		|=	 PARODD;
+            tty.c_cflag |= PARENB;
+            tty.c_cflag |= PARODD;
             break;
     }
 
@@ -87,11 +87,11 @@ auto unixSystemOpen(
     // Set num. stop bits
     switch(stopBits) {
         case 0:
-            tty.c_cflag     &=  ~CSTOPB;
+            tty.c_cflag &= ~CSTOPB;
             break;
         // TODO case 1: 1.5 would break the code
         case 2:
-            tty.c_cflag     |=  CSTOPB;
+            tty.c_cflag |= CSTOPB;
             break;
     }
 
