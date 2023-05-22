@@ -1,6 +1,6 @@
 # Serial
-[![Build Windows-latest](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml/badge.svg)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml)
-[![Build Ubuntu-latest](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml/badge.svg)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml)
+[![Build Win32](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml/badge.svg)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml)
+[![Build Linux](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml/badge.svg)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml)
 
 <img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain">
 
