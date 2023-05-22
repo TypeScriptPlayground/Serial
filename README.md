@@ -2,6 +2,7 @@
 [![Build Windows-latest](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml/badge.svg)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml)
 [![Build Ubuntu-latest](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml/badge.svg)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml)
 [![Build MacOS-latest](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_macos.yml/badge.svg)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_macos.yml)
+
 <img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain">
 
 A [serial](https://en.wikipedia.org/wiki/Serial_communication) library written in TypeScript for [Deno](https://deno.land) without third party modules.
