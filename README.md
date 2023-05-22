@@ -21,6 +21,7 @@ A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most
 - Create multiple serial connections at the same time.
 - List available ports and their properties.
 - Set timeouts for both reading and writing.
+- All functions are async.
 - Uses no third party modules.
 - Works on different operating systems (check [compatibility](#compatibility) for mor info).
 
