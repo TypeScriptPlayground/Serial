@@ -32,12 +32,116 @@ A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most
 
 ### Usage
 #### `class` Serial
-##### `methode` open()
-##### `methode` close()
-##### `methode` read()
-##### `methode` readUntil()
-##### `methode` write()
-##### `getter property` isOpen
+```typescript
+/**
+ * Create a new instance of a serial connection.
+ */
+new Serial()
+```
+----
+
+#### `getter property` Serial.isOpen
+```typescript
+/**
+ * Get the current connection status of the serial connection.
+ * @returns {boolean} Returns `true` if the serial connection is open, otherwise returns `false`
+ */
+get isOpen() : boolean
+```
+
+----
+
+#### `methode` Serial.open()
+```typescript
+/**
+ * Opens the serial connection.
+ * @param {string} port The port to connect
+ * @param {number} baudrate The baudrate
+ * @param {SerialOptions} serialOptions Additional options for the serial connection (`data bits`, `parity`, `stop bits`)
+ * @returns {number} The status code
+ */
+open(
+    port : string,
+    baudrate : number,
+    serialOptions? : SerialOptions
+) : number
+```
+
+----
+
+#### `methode` Serial.close()
+```typescript
+/**
+ * Closes the serial connection.
+ */
+close() : number
+```
+
+----
+
+#### `methode` Serial.read()
+```typescript
+/**
+ * Read data from serial connection.
+ * @param {Uint8Array} buffer Buffer to read the bytes into
+ * @param {number} bytes The number of bytes to read
+ * @param {number} timeout The timeout in `ms`
+ * @param {number} multiplier The timeout between reading individual bytes in `ms`
+ * @returns {number} Returns number of bytes read
+ */
+read(
+    buffer : Uint8Array,
+    bytes : number,
+    timeout = 0,
+    multiplier = 10
+) : number
+```
+
+----
+
+#### `methode` Serial.readUntil()
+```typescript
+/**
+ * Read data from serial connection until a linebreak (`\n`) gets send.
+ * @param {Uint8Array} buffer Buffer to read the bytes into
+ * @param {number} bytes The number of bytes to read
+ * @param {number} timeout The timeout in `ms`
+ * @param {number} multiplier The timeout between reading individual bytes in `ms`
+ * @param {string} searchString A string to search for
+ * @returns {number} Returns number of bytes read
+ */
+readUntil(
+    buffer : Uint8Array,
+    bytes : number,
+    timeout = 0,
+    multiplier = 10,
+    searchString = '',
+) : number
+```
+
+----
+
+#### `methode` Serial.write()
+```typescript
+/**
+ * Write data to serial connection.
+ * @param {Uint8Array} buffer The data to write/send
+ * @param {number} bytes The number of bytes to read
+ * @param {number} timeout The timeout in `ms`
+ * @param {number} multiplier The timeout between reading individual bytes in `ms`
+ * @returns {number} Returns number of bytes written
+ */
+write(
+    buffer : Uint8Array,
+    bytes : number,
+    timeout = 0,
+    multiplier = 10
+) : number
+```
+
+----
+
+### Examples
 ...
 ```typescript
 import { Serial, baudrate } from "./mod.ts";
