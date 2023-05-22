@@ -7,6 +7,8 @@ A serial device library written in TypeScript for [Deno](https://deno.land) with
 
 This library provides an interface for the communication with serial devices and **doesn't use any third party modules**. It uses C++ functions which are included in a dynamic library or shared object. These functions are then loaded by deno to establish a serial connection and talk to the devices.
 
+A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most of the C++ files and functions!
+
 <br>
 
 > <picture>
