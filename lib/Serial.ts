@@ -149,7 +149,7 @@ export class Serial {
 
     /**
      * Gat a list of the available ports.
-     * @returns {Ports[]} Returns a list of available ports
+     * @returns {Ports[]} Returns a list of ports info
      */
     getPortsInfo() : Ports[] {
         const buffer = new Uint8Array(1024);
