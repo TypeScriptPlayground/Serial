@@ -14,7 +14,7 @@ A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most
 >   <img alt="Warning" src="https://raw.githubusercontent.com/Mqxx/GitHub-Markdown/main/blockquotes/badge/dark-theme/warning.svg">
 > </picture><br>
 >
-> This library is still work in progress!
+> This library and the documentation are still work in progress!
 
 ### Features
 - Communication with serial devices.
