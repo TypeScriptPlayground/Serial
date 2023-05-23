@@ -37,26 +37,3 @@ jobs:
       with:
         name: Compiled-Binary
         path: ${{github.workspace}}/lib/dls/
-        
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-      with:
-        tag_name: v${{ github.ref }}
-        release_name: Release v${{ github.ref }}
-        draft: false
-        prerelease: false
-
-    - name: Upload Asset
-      id: upload_asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/lib/dls/serialport.dll
-        asset_name: serialport.dll
-        asset_content_type: application/octet-stream
-
