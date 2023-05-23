@@ -31,7 +31,6 @@ A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most
 ### Compatibility
 - [x] Windows (implemented)
 - [ ] Linux (in progress)
-- [ ] MacOS (planned)
 
 ### Possible/Known issues
 - What happens if you open multiple connections from the same instance.
