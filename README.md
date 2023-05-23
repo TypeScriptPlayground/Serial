@@ -1,6 +1,7 @@
 # Serial
 [![Build Win32 DLL](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml/badge.svg)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml)
 [![Build Linux SO](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml/badge.svg)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml)
+[![GitHub all releases](https://img.shields.io/github/downloads/TypeScriptPlayground/Serial/total?label=Downloads)](https://github.com/TypeScriptPlayground/Serial/releases)
 
 <a href="https://deno.land"><img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain"></a>
 
