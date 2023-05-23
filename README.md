@@ -36,6 +36,7 @@ A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most
 - What happens if you open multiple connections from the same instance.
 - Every function returns the status code although it is previously checked.
 - What happens if you async read 2 times directly after each other.
+- Linux write currently not working
 
 ### Usage
 #### `class` Serial
