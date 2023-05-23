@@ -1,0 +1,16 @@
+name: Release Binarys
+
+permissions:
+  contents: read
+
+on:
+  push:
+    tags:
+      - 'Release-v*'
+
+jobs:
+  release-binarys:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Tag
+        id: validate-tag
