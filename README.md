@@ -1,7 +1,7 @@
 # Serial
 [![Build Win32 DLL](https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build_windows.yml?color=2ebc4b&label=Build%20Win32%20DLL&labelColor=343b42&logo=github&logoColor=959DA5)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml)
 [![Build Linux SO](https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build_linux.yml?color=2ebc4b&label=Build%20Linux%20SO&labelColor=343b42&logo=github&logoColor=959DA5)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml)
-[![Releases Downloads](https://img.shields.io/github/downloads/TypeScriptPlayground/Serial/total?label=Downloads&labelColor=343b42&logo=github&logoColor=959DA5)](https://github.com/TypeScriptPlayground/Serial/releases)
+[![Releases Downloads](https://img.shields.io/github/downloads/TypeScriptPlayground/Serial/total?color=2ebc4b&label=Downloads&labelColor=343b42&logo=github&logoColor=959DA5)](https://github.com/TypeScriptPlayground/Serial/releases)
 
 <a href="https://deno.land"><img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain"></a>
 
