@@ -3,7 +3,7 @@ name: "Pre-Release"
 
 on:
   push:
-    branches: [ "main", "github-CI" ]
+    branches: [ "main" ]
     paths:
       - 'include/**'
       - 'src/**'

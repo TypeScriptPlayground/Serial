@@ -2,7 +2,7 @@ name: Build Win32 DLL
 
 on:
   push:
-    branches: [ "main", "github-CI" ]
+    branches: [ "main" ]
     paths:
       - 'include/**'
       - 'src/**'
