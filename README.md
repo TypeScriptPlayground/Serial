@@ -1,5 +1,5 @@
 # Serial
-[![Build Win32 DLL](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml/badge.svg)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build_windows.yml?label=Build%20Win32%20DLL&logo=github)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml)
 [![Build Linux SO](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml/badge.svg)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml)
 [![GitHub all releases](https://img.shields.io/github/downloads/TypeScriptPlayground/Serial/total?label=Downloads)](https://github.com/TypeScriptPlayground/Serial/releases)
 
