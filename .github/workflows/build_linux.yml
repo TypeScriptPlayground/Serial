@@ -2,10 +2,11 @@ name: Build Linux SO
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "github-CI" ]
     paths:
       - 'include/**'
       - 'src/**'
+      - '.github/workflows/build_linux.yml'
   pull_request:
     branches: [ "main" ]
     paths:
