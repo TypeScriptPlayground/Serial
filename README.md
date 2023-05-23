@@ -77,17 +77,17 @@ Send data to a serial device. For exampe to an [Arduino](https://www.arduino.cc/
 
 `main.ts`
 ```typescript
-import { Serial } from "./mod.ts";
+import { Serial, baudrate } from "./mod.ts";
 
 // create new instance of a serial object
 const serial = new Serial();
 
 // open the connection
-serial.open();
+serial.open('COM1', baudrate.B9600);
 
 // encode the message to a Uint8Array
-const textToSend = 'Hello from TypeScript!'
-const encodedTextToSend = new TextEncoder().encode(textToSend)
+const textToSend = 'Hello from TypeScript!';
+const encodedTextToSend = new TextEncoder().encode(textToSend);
 
 // send the message
 serial.send(encodedTextToSend, encodedTextToSend.length);
@@ -113,13 +113,13 @@ void loop() {
 
 `main.ts`
 ```typescript
-import { Serial } from "./mod.ts";
+import { Serial, baudrate } from "./mod.ts";
 
 // create new instance of a serial object
 const serial = new Serial();
 
 // open the connection
-serial.open();
+serial.open('COM1', baudrate.B9600);
 
 // create a new buffer to store incoming bytes,
 // in this example we want to read a maximum of 100 bytes
