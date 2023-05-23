@@ -1,38 +1,93 @@
-name: Release Binarys
-
-permissions:
-  contents: read
+---
+name: "Pre-Release"
 
 on:
   push:
-    tags:
-      - 'Release-v*'
+    branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'src/**'
+      - '.github/workflows/release.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'include/**'
+      - 'src/**'
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
 
 jobs:
-  release-binarys:
+  build_linux:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Validate Tag
-        id: validate-tag
-        
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-      with:
-        tag_name: v${{ github.ref }}
-        release_name: Release v${{ github.ref }}
-        draft: false
-        prerelease: false
+    - uses: actions/checkout@v3
+    
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
-    - name: Upload Asset
-      id: upload_asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Archive artifact
+      uses: actions/upload-artifact@v3
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/lib/dls/serialport.dll
-        asset_name: serialport.dll
-        asset_content_type: application/octet-stream
+        name: linux-binary
+        path: ${{github.workspace}}/build/libserialport.so
+        
+  build_windows:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Archive artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-binary
+        path: ${{github.workspace}}\build\Release\serialport.dll
+
+  pre-release:
+    needs: [build_windows, build_linux]
+    name: "Pre Release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: actions/checkout@v3
+    
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ${{github.workspace}}/tmp
+          
+      - name: Rename linux Binary
+        run: mv ${{github.workspace}}/tmp/linux-binary/libserialport.so ${{github.workspace}}/lib/dls/linux.so
+        
+      - name: Rename windows Binary
+        run: mv ${{github.workspace}}/tmp/windows-binary/serialport.dll ${{github.workspace}}/lib/dls/windows.dll
+        
+      - run: cd ${{github.workspace}}
+        
+      - name: make .tar.gz file
+        run: tar -czvf lib.tar.gz ./lib
+        
+      - name: make .zip
+        run: zip -r lib.zip ./lib
+    
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.RELEASE_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            lib.tar.gz
+            lib.zip

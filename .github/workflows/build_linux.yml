@@ -6,6 +6,7 @@ on:
     paths:
       - 'include/**'
       - 'src/**'
+      - '.github/workflows/build_linux.yml'
   pull_request:
     branches: [ "main" ]
     paths:
@@ -31,6 +32,14 @@ jobs:
       
     - name: Move compiled file
       run: mv ${{github.workspace}}/build/libserialport.so ${{github.workspace}}/lib/dls/
+
+    # - name: Commit artifact changes
+    #   run: |
+    #     git config --local user.email "action@github.com"
+    #     git config --local user.name "GitHub Action"
+    #     git add lib/dls/*
+    #     git commit -m "Add artifact"
+    #     git push
       
     - name: Archive artifact
       uses: actions/upload-artifact@v3

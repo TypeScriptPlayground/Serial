@@ -6,6 +6,7 @@ on:
     paths:
       - 'include/**'
       - 'src/**'
+      - '.github/workflows/build_windows.yml'
   pull_request:
     branches: [ "main" ]
     paths:
