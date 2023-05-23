@@ -33,7 +33,7 @@ jobs:
       run: mv ${{github.workspace}}/build/libserialport.so ${{github.workspace}}/lib/dls/
       
     - name: Archive artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Compiled-Binary
         path: ${{github.workspace}}/lib/dls/
