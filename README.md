@@ -1,15 +1,18 @@
+<!-- Badges -->
+[Build Win32 DLL]: https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build_windows.yml?label=Build%20Win32%20DLL&labelColor=343b42&logo=github&logoColor=959DA5 'Win32 Build'
+[Build Linux SO]: https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build_linux.yml?label=Build%20Linux%20SO&labelColor=343b42&logo=github&logoColor=959DA5 'Linux Build'
+[Release Downloads]: https://img.shields.io/github/downloads/TypeScriptPlayground/Serial/total?label=Downloads%20&labelColor=343b42&logo=docusign&logoColor=959DA5 'Total Release Downloads'
+
 # Serial
-[![Build Win32 DLL](https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build_windows.yml?label=Build%20Win32%20DLL&labelColor=343b42&logo=github&logoColor=959DA5)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml)
-[![Build Linux SO](https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build_linux.yml?label=Build%20Linux%20SO&labelColor=343b42&logo=github&logoColor=959DA5)](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml)
-[![Releases Downloads](https://img.shields.io/github/downloads/TypeScriptPlayground/Serial/total?label=Downloads%20&labelColor=343b42&logo=docusign&logoColor=959DA5)](https://github.com/TypeScriptPlayground/Serial/releases)
+[![Build Win32 DLL]](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml)
+[![Build Linux SO]](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml)
+[![Release Downloads]](https://github.com/TypeScriptPlayground/Serial/releases)
 
 <a href="https://deno.land"><img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain"></a>
 
 A [serial](https://en.wikipedia.org/wiki/Serial_communication) library written in TypeScript for [Deno](https://deno.land) without any third party modules.
 
 This library provides an interface for the communication with serial devices and **doesn't use any third party modules**. It uses C++ functions which are included in a [dynamic link library](https://de.wikipedia.org/wiki/Dynamic_Link_Library) or [shared object](https://en.wikipedia.org/wiki/Library_(computing)#Shared_libraries). These functions are then loaded by deno to establish a serial connection and talk to the devices.
-
-A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most of the C++ files and functions!
 
 <br>
 
@@ -20,7 +23,7 @@ A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most
 >
 > This library and the documentation are still work in progress!
 
-### Features
+## Features
 - Communication with serial devices.
 - Create multiple serial connections at the same time.
 - List available ports and their properties.
@@ -29,129 +32,113 @@ A big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most
 - Uses no third party modules.
 - Works on different operating systems (check [compatibility](#compatibility) for mor info).
 
-### Compatibility
-- [x] Windows (implemented)
-- [ ] Linux (in progress)
+## Compatibility
+| OS      | Tested version   | Current state |
+|---------|------------------|---------------|
+| Windows | Windows 10 (x64) | implemented   |
+| Linux   | -                | in progress   |
 
-### Possible/Known issues
+## Possible/Known issues
 - What happens if you open multiple connections from the same instance.
 - Every function returns the status code although it is previously checked.
 - What happens if you async read 2 times directly after each other.
 - Linux write currently not working
 
-### Usage
-#### `class` Serial
+## Examples - How to use
+### Ports
+Get a list with all serial ports and their info that are currently available on your system.
+
+`main.ts`
 ```typescript
-/**
- * Create a new instance of a serial connection.
- */
-new Serial()
+import { Serial } from "./mod.ts";
+
+// create new instance of a serial object
+const serial = new Serial();
+
+// get all available ports
+const availablePorts = serial.getPortsInfo();
+
+// console log the list
+console.log(availablePorts);
 ```
 
-<br>
+> Example output:
+> ```
+> [
+>   { name: 'COM1' },
+>   { name: 'COM2' },
+>   ...
+>   { name: 'tty/USB1' }
+> ]
+> ```
 
-#### `getter property` Serial.isOpen
+### Sending
+Send data to a serial device. For exampe to an [Arduino](https://www.arduino.cc/).
+
+`main.ts`
 ```typescript
-/**
- * Get the current connection status of the serial connection.
- * @returns {boolean} Returns `true` if the serial connection is open, otherwise returns `false`
- */
-get isOpen() : boolean
+import { Serial } from "./mod.ts";
+
+// create new instance of a serial object
+const serial = new Serial();
+
+// open the connection
+serial.open();
+
+// encode the message to a Uint8Array
+const textToSend = 'Hello from TypeScript!'
+const encodedTextToSend = new TextEncoder().encode(textToSend)
+
+// send the message
+serial.send(encodedTextToSend, encodedTextToSend.length);
 ```
 
-<br>
+### Reading
+Read data from a serial device. Again, in our example from an Arduino.
+> Depending on your Arduino board you may need to press the reset button on the board after uploading the sketch, in order to receive data.
 
-#### `methode` Serial.open()
-```typescript
-/**
- * Opens the serial connection.
- * @param {string} port The port to connect
- * @param {number} baudrate The baudrate
- * @param {SerialOptions} serialOptions Additional options for the serial connection (`data bits`, `parity`, `stop bits`)
- * @returns {number} The status code
- */
-open(
-    port : string,
-    baudrate : number,
-    serialOptions? : SerialOptions
-) : number
+`sketch.ino`
+```ino
+void setup() {
+  Serial.begin(9600);
+  while (!Serial) {
+    ;
+  }
+}
+
+void loop() {
+  Serial.println("Hello from Arduino!");
+}
 ```
 
-<br>
-
-#### `methode` Serial.close()
+`main.ts`
 ```typescript
-/**
- * Closes the serial connection.
- */
-close() : number
+import { Serial } from "./mod.ts";
+
+// create new instance of a serial object
+const serial = new Serial();
+
+// open the connection
+serial.open();
+
+// create a new buffer to store incoming bytes,
+// in this example we want to read a maximum of 100 bytes
+const bufferToRead = new Uint8Array(100);
+
+// read data into the buffer
+serial.read(bufferToRead, bufferToRead.length);
+
+// decode the data from the buffer
+const decodedTextToRead = new TextDecoder().decode(bufferToRead);
+
+// console log the text
+console.log(decodedTextToRead);
 ```
 
-<br>
-
-#### `methode` Serial.read()
-```typescript
-/**
- * Read data from serial connection.
- * @param {Uint8Array} buffer Buffer to read the bytes into
- * @param {number} bytes The number of bytes to read
- * @param {number} timeout The timeout in `ms`
- * @param {number} multiplier The timeout between reading individual bytes in `ms`
- * @returns {number} Returns number of bytes read
- */
-read(
-    buffer : Uint8Array,
-    bytes : number,
-    timeout = 0,
-    multiplier = 10
-) : number
-```
-
-<br>
-
-#### `methode` Serial.readUntil()
-```typescript
-/**
- * Read data from serial connection until a linebreak (`\n`) gets send.
- * @param {Uint8Array} buffer Buffer to read the bytes into
- * @param {number} bytes The number of bytes to read
- * @param {number} timeout The timeout in `ms`
- * @param {number} multiplier The timeout between reading individual bytes in `ms`
- * @param {string} searchString A string to search for
- * @returns {number} Returns number of bytes read
- */
-readUntil(
-    buffer : Uint8Array,
-    bytes : number,
-    timeout = 0,
-    multiplier = 10,
-    searchString = '',
-) : number
-```
-
-<br>
-
-#### `methode` Serial.write()
-```typescript
-/**
- * Write data to serial connection.
- * @param {Uint8Array} buffer The data to write/send
- * @param {number} bytes The number of bytes to read
- * @param {number} timeout The timeout in `ms`
- * @param {number} multiplier The timeout between reading individual bytes in `ms`
- * @returns {number} Returns number of bytes written
- */
-write(
-    buffer : Uint8Array,
-    bytes : number,
-    timeout = 0,
-    multiplier = 10
-) : number
-```
-
-<br>
-
-### Examples
+> Example output:
+> ```
+> Hello from Arduino!
+> ```
 
 WIP
 
@@ -205,3 +192,12 @@ void loop() {
   }
 }
 ```
+## Credits
+
+- Big thanks goes out to [@Katze719](https://github.com/Katze719) who wrote most of the C++ files and functions!
+- Thanks to [@AapoAlas](https://github.com/aapoalas) for the great support and help on the [Deno Discord](https://discord.gg/deno)!
+
+## Licence
+Apache-2.0. Check [LICENSE](./LICENSE) for more details. Feel free to contribute to this project.
+
+Copyright 2023 © Max
