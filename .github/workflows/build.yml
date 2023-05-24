@@ -1,19 +1,17 @@
----
-name: "Pre-Release"
+name: Build Binarys
 
 on:
-  pull_request:
-    branches: [ "main" ]
+  push:
     paths:
       - 'include/**'
       - 'src/**'
-      - '.github/workflows/release.yml'
+      - '.github/workflows/build.yml'
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
 
-jobs:
+jobs:    
   build_linux:
     runs-on: ubuntu-latest
     
@@ -49,14 +47,17 @@ jobs:
       with:
         name: windows-binary
         path: ${{github.workspace}}\build\Release\serialport.dll
-
-  pre-release:
+        
+  commit:
     needs: [build_windows, build_linux]
-    name: "Pre Release"
-    runs-on: "ubuntu-latest"
+    name: commit binarys
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
     
       - name: Download artifacts
         uses: actions/download-artifact@v3
@@ -68,21 +69,15 @@ jobs:
         
       - name: Rename windows Binary
         run: mv ${{github.workspace}}/tmp/windows-binary/serialport.dll ${{github.workspace}}/lib/dls/windows.dll
-        
-      - run: cd ${{github.workspace}}
-        
-      - name: make .tar.gz file
-        run: tar -czvf SerialLink-lib.tar.gz ./lib
-        
-      - name: make .zip
-        run: zip -r SerialLink-lib.zip ./lib
-    
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: Commit files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "GitHub Actions [Bot]"
+          git add ${{github.workspace}}/lib/dls/*
+          git diff-index --quiet HEAD || git commit -m "compiled binarys"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
         with:
-          repo_token: "${{ secrets.RELEASE_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Development Build"
-          files: |
-            SerialLink-lib.tar.gz
-            SerialLink-lib.zip
+          github_token: ${{ secrets.RELEASE_TOKEN }}
+          branch: ${{ github.ref }}
+    
