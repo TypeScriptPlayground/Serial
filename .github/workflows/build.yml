@@ -64,6 +64,9 @@ jobs:
         with:
           path: ${{github.workspace}}/tmp
           
+      - name: Create bin folder if it does not exist
+        run: mkdir -p ${{github.workspace}}/lib/bin
+        
       - name: Rename linux Binary
         run: mv ${{github.workspace}}/tmp/linux-binary/libserialport.so ${{github.workspace}}/lib/bin/linux.so
         
