@@ -3,7 +3,6 @@ name: Build Binarys
 on:
   push:
     paths:
-      - 'include/**'
       - 'src/**'
       - '.github/workflows/build.yml'
 
