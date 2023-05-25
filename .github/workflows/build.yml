@@ -13,6 +13,7 @@ env:
 
 jobs:    
   build_linux:
+    name: Build linux binaries
     runs-on: ubuntu-latest
     
     steps:
@@ -24,13 +25,14 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       
-    - name: Archive artifact
+    - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: linux-binary
         path: ${{github.workspace}}/build/libserialport.so
         
   build_windows:
+    name: Build win64 binaries
     runs-on: windows-latest
     
     steps:
@@ -42,7 +44,7 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
       
-    - name: Archive artifact
+    - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
         name: windows-binary
@@ -50,7 +52,7 @@ jobs:
         
   commit:
     needs: [build_windows, build_linux]
-    name: commit binarys
+    name: Commit binaries
     runs-on: ubuntu-latest
 
     steps:
@@ -59,7 +61,7 @@ jobs:
           persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
           fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
     
-      - name: Download artifacts
+      - name: Download artifact
         uses: actions/download-artifact@v3
         with:
           path: ${{github.workspace}}/tmp
@@ -67,17 +69,22 @@ jobs:
       - name: Create bin folder if it does not exist
         run: mkdir -p ${{github.workspace}}/lib/bin
         
-      - name: Rename linux Binary
+      - name: Move and rename linux binary
         run: mv ${{github.workspace}}/tmp/linux-binary/libserialport.so ${{github.workspace}}/lib/bin/linux.so
         
-      - name: Rename windows Binary
+      - name: Move and rename windows binary
         run: mv ${{github.workspace}}/tmp/windows-binary/serialport.dll ${{github.workspace}}/lib/bin/windows.dll
-      - name: Commit files
+        
+      - name: Configure Git
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "GitHub Actions [Bot]"
+          git config --local user.name "github-actions[bot]"
+          
+      - name: Commit binaries
+        run: |
           git add ${{github.workspace}}/lib/bin/*
-          git diff-index --quiet HEAD || git commit -m "Pushed compiled binarys"
+          git diff-index --quiet HEAD || git commit -m "Commited compiled binaries"
+          
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
