@@ -5,8 +5,11 @@ export function registerSerialFunctions(
     os : string,
     libSuffix : string
 ) : SerialFunctions {
+    console.log('Opening:', `${path}/${os}.${libSuffix}`);
+    
+
     const serialFunctions = Deno.dlopen(`${path}/${os}.${libSuffix}`, {
-        'open': {
+        'serialOpen': {
             parameters: [
                 // Port
                 'buffer',
@@ -22,12 +25,12 @@ export function registerSerialFunctions(
             // Status code
             result: 'i32'
         },
-        'close': {
+        'serialClose': {
             parameters: [],
             // Status code
             result: 'i32'
         },
-        'read': {
+        'serialRead': {
             parameters: [
                 // Buffer
                 'buffer',
@@ -41,7 +44,7 @@ export function registerSerialFunctions(
             // Status code/Bytes read
             result: 'i32'
         },
-        'readUntil': {
+        'serialReadUntil': {
             parameters: [
                 // Buffer
                 'buffer',
@@ -57,7 +60,7 @@ export function registerSerialFunctions(
             // Status code/Bytes read
             result: 'i32'
         },
-        'write': {
+        'serialWrite': {
             parameters: [
                 // Buffer
                 'buffer',
@@ -71,7 +74,7 @@ export function registerSerialFunctions(
             // Status code/Bytes written
             result: 'i32'
         },
-        'getAvailablePorts': {
+        'serialGetAvailablePorts': {
             parameters: [
                 // Buffer
                 'buffer',
@@ -86,11 +89,11 @@ export function registerSerialFunctions(
     }).symbols
     
     return {
-        open: serialFunctions.open,
-        close:  serialFunctions.close,
-        read: serialFunctions.read,
-        readUntil: serialFunctions.readUntil,
-        write: serialFunctions.write,
-        getAvailablePorts: serialFunctions.getAvailablePorts
+        open: serialFunctions.serialOpen,
+        close:  serialFunctions.serialClose,
+        read: serialFunctions.serialRead,
+        readUntil: serialFunctions.serialReadUntil,
+        write: serialFunctions.serialWrite,
+        getAvailablePorts: serialFunctions.serialGetAvailablePorts
     }
 }
