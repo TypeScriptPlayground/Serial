@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(LIB true)
 
+set(PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+
 file(GLOB_RECURSE SRCS ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 # a macro that gets all of the header containing directories. 
