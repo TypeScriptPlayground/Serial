@@ -1,6 +1,4 @@
 import { SerialFunctions } from "./interfaces/serial_functions.d.ts";
-import { encode } from "./encode.ts";
-import { parity } from "./constants/parity.ts";
 
 export function registerSerialFunctions(
     path : string,
@@ -88,63 +86,11 @@ export function registerSerialFunctions(
     }).symbols
     
     return {
-        open: (
-            port : string,
-            baudrate : number,
-            dataBits : number,
-            parity : parity,
-            stopBits : number
-        ) : number => serialFunctions.open(
-            encode(port + '\0'),
-            baudrate,
-            dataBits,
-            parity,
-            stopBits
-        ),
-        close: () : number => serialFunctions.close(),
-        read: (
-            buffer : Uint8Array,
-            bytes : number,
-            timeout : number,
-            multiplier : number
-        ) : number => serialFunctions.read(
-            buffer,
-            bytes,
-            timeout,
-            multiplier
-        ),
-        readUntil: (
-            buffer : Uint8Array,
-            bytes : number,
-            timeout : number,
-            multiplier : number,
-            searchString : string
-        ) : number => serialFunctions.readUntil(
-            buffer,
-            bytes,
-            timeout,
-            multiplier,
-            encode(searchString + '\0')
-        ),
-        write: (
-            buffer : Uint8Array,
-            bytes : number,
-            timeout : number,
-            multiplier : number
-        ) : number => serialFunctions.write(
-            buffer,
-            bytes,
-            timeout,
-            multiplier
-        ),
-        getAvailablePorts: (
-            buffer : Uint8Array,
-            bytes : number,
-            separator : string
-        ) : number => serialFunctions.getAvailablePorts(
-            buffer,
-            bytes,
-            encode(separator + '\0')
-        )
+        open: serialFunctions.open,
+        close:  serialFunctions.close,
+        read: serialFunctions.read,
+        readUntil: serialFunctions.readUntil,
+        write: serialFunctions.write,
+        getAvailablePorts: serialFunctions.getAvailablePorts
     }
 }

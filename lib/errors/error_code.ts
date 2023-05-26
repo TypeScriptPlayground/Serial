@@ -1,8 +1,8 @@
-import { statusCodes } from "../constants/status_codes.ts";
-
 export class ErrorCode extends Error {
+    code : number
+
     constructor(code : number) {
-        const errorCodeKey = Object.keys(statusCodes).find(key => statusCodes[key] === code);
-        super(`An error has occurred. Error code: ${errorCodeKey} (${code})`);
+        super(`An error has occurred. Error code: ${code}`);
+        this.code = code;
     }
 }

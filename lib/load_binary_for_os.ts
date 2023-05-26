@@ -1,7 +1,13 @@
 import { SerialFunctions } from "./interfaces/serial_functions.d.ts";
 import { registerSerialFunctions } from "./register_serial_functions.ts";
 
-export function loadDL(path : string, os : string) : SerialFunctions {
+/**
+ * This function is used to load the specific binary based on the current os.
+ * @param path The default path to the binaries directory
+ * @param os The current OS
+ * @returns A serial functions object with all the functions from the binary
+ */
+export function loadBinaryForOS(path : string, os : string) : SerialFunctions {
     let libSuffix = '';
 
     switch(os) {
@@ -24,10 +30,9 @@ export function loadDL(path : string, os : string) : SerialFunctions {
 
                 - Windows (implemented)
                 - Linux (in progress)
-                - MacOS (planned)
                 
                 For more information feel free to check out the repository:
-                https://github.com/TypeScriptPlayground/Serial`
+                https://github.com/TypeScriptPlayground/Serial#compatibility`
             );
         }
 
