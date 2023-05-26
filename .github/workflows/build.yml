@@ -28,7 +28,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: linux-binary
-        path: ${{github.workspace}}/build/libserialport.so
+        path: ${{github.workspace}}/build/src/libserialport.so
         
   build_windows:
     name: Build win64 binaries
@@ -47,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: windows-binary
-        path: ${{github.workspace}}\build\Release\serialport.dll
+        path: ${{github.workspace}}\build\src\Release\serialport.dll
         
   commit:
     needs: [build_windows, build_linux]
