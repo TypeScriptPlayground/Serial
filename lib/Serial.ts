@@ -19,7 +19,7 @@ export class Serial {
      */
     constructor() {
         this._isOpen = false;
-        this._dl = loadBinaryForOS('./lib/dls', Deno.build.os);
+        this._dl = loadBinaryForOS('./lib/bin', Deno.build.os);
     }
 
     /**
