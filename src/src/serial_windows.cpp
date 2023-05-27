@@ -242,7 +242,6 @@ auto windowsSystemGetAvailablePorts(
         // Error if open fails
         if (hPort == INVALID_HANDLE_VALUE) {
             CloseHandle(hPort);
-            returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
         }
 
         portsCounter++;
