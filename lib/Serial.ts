@@ -40,7 +40,7 @@ export class Serial {
         port : string,
         baudrate : Baudrate,
         serialOptions? : SerialOptions
-    ) : number {
+    ) : void {
         const result = this._dl.open(
             encode(port + '\0'),
             baudrate,
@@ -52,8 +52,6 @@ export class Serial {
         checkForErrorCode(result);
 
         this._isOpen = true;
-
-        return result;
     }
 
     /**
