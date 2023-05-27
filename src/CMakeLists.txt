@@ -1,7 +1,14 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.26)
+
+set(PROJECT_N serialport)
+project(${PROJECT_N} VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+include_directories(${PROJECT_N} PUBLIC include)
+
+message("boo")
 
 set(LIB true)
 
@@ -20,12 +27,14 @@ MACRO(header_directories return_list includes_base_folder extention )
 ENDMACRO()
 
 # using said macro.
-header_directories(INCLUDES ${PROJECT_SOURCE_DIR}/src/include/ hpp)
+header_directories(INCLUDES ${PROJECT_SOURCE_DIR}/src/include/ h)
 
 message("src files:")
 foreach(file ${SRCS})
         message(STATUS ${file})
 endforeach()
+
+message("hey")
 
 message("include directories:")
 foreach(dir ${INCLUDES})
@@ -37,7 +46,5 @@ if(LIB)
 else()
     add_executable(${PROJECT_N} ${SRCS}) 
 endif(LIB)
-
-target_include_directories(${PROJECT_N} PUBLIC include)
 
 # set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-shared -fPIC -Wall")
