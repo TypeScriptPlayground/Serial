@@ -9,5 +9,3 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 add_subdirectory(src)
 
 target_include_directories(${PROJECT_N} PUBLIC include)
-
-message("boo")

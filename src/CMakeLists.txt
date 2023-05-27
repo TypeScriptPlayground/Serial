@@ -8,8 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include_directories(${PROJECT_N} PUBLIC include)
 
-message("boo")
-
 set(LIB true)
 
 file(GLOB_RECURSE SRCS ${PROJECT_SOURCE_DIR}/src/*.cpp)
@@ -33,8 +31,6 @@ message("src files:")
 foreach(file ${SRCS})
         message(STATUS ${file})
 endforeach()
-
-message("hey")
 
 message("include directories:")
 foreach(dir ${INCLUDES})
