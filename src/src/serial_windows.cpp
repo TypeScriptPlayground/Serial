@@ -250,6 +250,12 @@ auto windowsSystemGetAvailablePorts(
 
         CloseHandle(hPort);
     }
+
+    // Remove last trailing comma
+    if (result.length() > 0) {
+        result.erase(result.length() - 1);
+    }
+
     // Error if buffer size is to small
     if (result.length() + 1 > bufferSize) {
         returnStatus(StatusCodes::BUFFER_ERROR);
