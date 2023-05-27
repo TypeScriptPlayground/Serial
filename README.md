@@ -4,8 +4,7 @@
 [Release Downloads]: https://img.shields.io/github/downloads/TypeScriptPlayground/Serial/total?label=Downloads%20&labelColor=343b42&logo=docusign&logoColor=959DA5 'Total Release Downloads'
 
 # Serial
-[![Build Win32 DLL]](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml)
-[![Build Linux SO]](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml)
+[![Build]](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build.yml)
 [![Release Downloads]](https://github.com/TypeScriptPlayground/Serial/releases)
 
 <a href="https://deno.land"><img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain"></a>
