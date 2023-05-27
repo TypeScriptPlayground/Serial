@@ -1,3 +1,4 @@
+import { binaryExtensions } from "./constants/binary_extensions.ts";
 import { SerialFunctions } from "./interfaces/serial_functions.d.ts";
 import { registerSerialFunctions } from "./register_serial_functions.ts";
 
@@ -8,38 +9,19 @@ import { registerSerialFunctions } from "./register_serial_functions.ts";
  * @returns A serial functions object with all the functions from the binary
  */
 export function loadBinaryForOS(path : string, os : string) : SerialFunctions {
-    let libSuffix = '';
+    if (!binaryExtensions[os]) {
+        throw new Error(
+            `There is currently no implementation for this operating system.
+            We are currently working on an implementation for all missing operating systems.
+            Current stage:
 
-    switch(os) {
-        case 'windows': {
-            libSuffix = 'dll';
-            break;
-        }
-
-        case 'linux':
-        case 'darwin':
-        case 'freebsd':
-        case 'netbsd':
-        case 'aix':
-        case 'solaris':
-        case 'illumos': {
-            throw new Error(
-                `There is currently no implementation for this operating system.
-                We are currently working on an implementation for all missing operating systems.
-                Current stage:
-
-                - Windows (implemented)
-                - Linux (in progress)
-                
-                For more information feel free to check out the repository:
-                https://github.com/TypeScriptPlayground/Serial#compatibility`
-            );
-        }
-
-        default: {
-            break;
-        }
+            - Windows (implemented)
+            - Linux (in progress)
+            
+            For more information feel free to check out the repository:
+            https://github.com/TypeScriptPlayground/Serial#compatibility`
+        );
     }
     
-    return registerSerialFunctions(path, os, libSuffix);
+    return registerSerialFunctions(path, os, binaryExtensions[os]);
 }
