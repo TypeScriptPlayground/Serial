@@ -43,6 +43,10 @@ This library provides an interface for the communication with serial devices and
 - Linux write currently not working
 
 ## Examples - How to use
+To use this library you need the following flags to run it:
+- `--unstable`
+- `--allow-ffi`
+
 ### Ports
 Get a list with all serial ports and their info that are currently available on your system.
 
