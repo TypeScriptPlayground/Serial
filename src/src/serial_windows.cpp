@@ -27,7 +27,7 @@ namespace helper {
         static std::string errorMessage;
         if (result != 0 && buffer != nullptr)
         {
-            errorMessage = buffer;
+            errorMessage = std::string(buffer);
             LocalFree(buffer);
         }
         else
