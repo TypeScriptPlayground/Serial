@@ -11,7 +11,7 @@ void (*callback)(int code);
 namespace helper {
     void Callback(StatusCodes errorCode){        
         static std::string msg = "";
-        callback(status(errorCode), static_cast<void*>(&msg));
+        callback(status(errorCode));
     }
 }
 
