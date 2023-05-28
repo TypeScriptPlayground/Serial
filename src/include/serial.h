@@ -37,7 +37,7 @@
 extern "C" {
 #endif
 
-    MODULE_API auto serialSetCallBackFunction(void (*func)()) -> void;
+    MODULE_API auto serialSetCallBackFunction(void (*func)(int code)) -> void;
 
     MODULE_API auto serialOpen(
         void* port,

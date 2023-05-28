@@ -1,6 +1,6 @@
 #include "serial.h"
 
-void serialSetCallBackFunction(void (*func)()) {
+void serialSetCallBackFunction(void (*func)(int code)) {
     systemSetCallbackFunction(func);
 }
 

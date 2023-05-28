@@ -93,11 +93,13 @@ export function registerSerialFunctions(
     }).symbols
 
     const callback = new Deno.UnsafeCallback({
-        parameters: [],
+        parameters: [
+            'i32'
+        ],
         result: "void",
     } as const,
-    () => {
-        console.log('Callback from C++!');    
+    (code) => {
+        console.log('Callback from C++ with code:', code);    
     });
 
     serialFunctions.serialSetCallBackFunction(callback.pointer);
