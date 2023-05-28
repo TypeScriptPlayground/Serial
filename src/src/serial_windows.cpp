@@ -95,7 +95,7 @@ auto readWindows(
 ) -> int {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        return status(StatusCodes::INVALID_HANDLE_ERROR);
+        callback(status(StatusCodes::INVALID_HANDLE_ERROR));
     }
 
     timeouts.ReadIntervalTimeout = timeout;
@@ -104,14 +104,14 @@ auto readWindows(
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        return status(StatusCodes::SET_TIMEOUT_ERROR);
+        callback(status(StatusCodes::SET_TIMEOUT_ERROR));
     }
 
-    DWORD bytesRead;
+    DWORD bytesRead = 0;
 
     // Error if read fails
     if (!ReadFile(hSerialPort, buffer, bufferSize, &bytesRead, NULL)) {
-        return status(StatusCodes::READ_ERROR);
+        callback(status(StatusCodes::READ_ERROR));
     }
     
     return bytesRead;
@@ -126,7 +126,7 @@ auto readUntilWindows(
 ) -> int {
 
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        return status(StatusCodes::INVALID_HANDLE_ERROR);
+        callback(status(StatusCodes::INVALID_HANDLE_ERROR));
     }
 
     timeouts.ReadIntervalTimeout = timeout;
@@ -135,7 +135,7 @@ auto readUntilWindows(
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        return status(StatusCodes::SET_TIMEOUT_ERROR);
+        callback(status(StatusCodes::SET_TIMEOUT_ERROR));
     }
 
     data = "";
@@ -146,7 +146,7 @@ auto readUntilWindows(
 
         // Error if read fails
         if (!ReadFile(hSerialPort, bufferChar, sizeof(bufferChar), &bytesRead, NULL)) {
-            return status(StatusCodes::READ_ERROR);
+            callback(status(StatusCodes::READ_ERROR));
         }
 
         if (bytesRead == 0) {
@@ -162,19 +162,19 @@ auto readUntilWindows(
 }
 
 auto writeWindows(void* buffer, const int bufferSize, const int timeout, const int multiplier) -> int {
-    DWORD bytesWritten;
+    DWORD bytesWritten = 0;
 
     timeouts.WriteTotalTimeoutConstant = timeout;
     timeouts.WriteTotalTimeoutMultiplier = multiplier;
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        return status(StatusCodes::SET_TIMEOUT_ERROR);
+        callback(status(StatusCodes::SET_TIMEOUT_ERROR));
     }
 
     // Error if write fails
     if (!WriteFile(hSerialPort, buffer, bufferSize, &bytesWritten, NULL)) {
-        return status(StatusCodes::WRITE_ERROR);
+        callback(status(StatusCodes::WRITE_ERROR));
     }
     
     return bytesWritten;
@@ -211,7 +211,8 @@ auto getPortsInfoWindows(
 
     // Error if buffer size is to small
     if (result.length() + 1 > bufferSize) {
-        return status(StatusCodes::BUFFER_ERROR);
+        callback(status(StatusCodes::BUFFER_ERROR));
+        return 0;
     }
 
     memcpy(buffer, result.c_str(), result.length() + 1);
