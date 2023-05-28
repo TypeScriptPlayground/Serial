@@ -15,7 +15,7 @@ namespace helper {
     }
 }
 
-void windowsSetCallbackFunction(void (*func)(int code, void* buffer)){
+void unixSystemError(void (*func)(int code, void* buffer)){
     callback = func;
 }
 
