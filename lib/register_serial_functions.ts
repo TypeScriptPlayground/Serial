@@ -91,20 +91,22 @@ export function registerSerialFunctions(
         }
     }).symbols
 
-    const callback = new Deno.UnsafeCallback({
-        parameters: [
-            'i32',
-            'buffer'
-        ],
-        result: "void",
-    } as const,
-    (code, message) => {
-        console.log('Callback from C++ with code:', code, '\nmessage:', Deno.UnsafePointerView.getCString(message!));
-    });
-
-    serialFunctions.serialError(callback.pointer);
-    
     return {
+        error: (callback) => {
+            serialFunctions.serialError(new Deno.UnsafeCallback({
+                parameters: [
+                    'i32',
+                    'buffer'
+                ],
+                result: "void",
+            } as const,
+            (code, message) => {
+                callback(
+                    code,
+                    Deno.UnsafePointerView.getCString(message!)
+                )
+            }).pointer)
+        },
         open: serialFunctions.serialOpen,
         close:  serialFunctions.serialClose,
         read: serialFunctions.serialRead,
