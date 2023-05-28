@@ -6,23 +6,23 @@
 #include <windows.h>
 #include "status_codes.h"
 
-extern void (*callback)(int code, void* buffer, int size);
+extern void (*callback)(int code, void* buffer);
 
 extern HANDLE hSerialPort;
 extern DCB dcbSerialParams;
 extern COMMTIMEOUTS timeouts;
 
-void windowsSetCallbackFunction(void (*func)(int code, void* buffer, int size));
+void windowsSetCallbackFunction(void (*func)(int code, void* buffer));
 
-auto windowsSystemOpen(
+void windowsSystemOpen(
     void* port,
     const int baudrate,
     const int dataBits,
     const int parity = 0,
     const int stopBits = 0
-) -> int;
+);
 
-auto windowsSystemClose() -> int;
+void windowsSystemClose();
 
 auto windowsSystemRead(
     void* buffer,

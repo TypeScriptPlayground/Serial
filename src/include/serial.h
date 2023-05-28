@@ -37,17 +37,17 @@
 extern "C" {
 #endif
 
-    MODULE_API auto serialSetCallBackFunction(void (*func)(int code, void* buffer, int size)) -> void;
+    MODULE_API auto serialSetCallBackFunction(void (*func)(int code, void* buffer)) -> void;
 
-    MODULE_API auto serialOpen(
+    MODULE_API void serialOpen(
         void* port,
         const int baudrate,
         const int dataBits,
         const int parity = 0,
         const int stopBits = 0
-    ) -> int;
+    );
 
-    MODULE_API auto serialClose() -> int;
+    MODULE_API void serialClose();
 
     MODULE_API auto serialRead(
         void* buffer,
