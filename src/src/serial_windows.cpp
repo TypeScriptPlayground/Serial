@@ -171,6 +171,12 @@ auto readUntilWindows(
 }
 
 auto writeWindows(void* buffer, const int bufferSize, const int timeout, const int multiplier) -> int {
+    // Error if handle is invalid
+    if (hSerialPort == INVALID_HANDLE_VALUE) {
+        callback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        return 0;
+    }
+
     DWORD bytesWritten = 0;
 
     timeouts.WriteTotalTimeoutConstant = timeout;
