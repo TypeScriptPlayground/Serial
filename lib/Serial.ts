@@ -22,9 +22,9 @@ export class Serial {
     constructor() {
         this._isOpen = false;
         this._dl = loadBinaryForOS(pathToBinariesDirectory, Deno.build.os);
-        this._dl.error((code, message) => {
-            throw new Error(`An error has occurred. Error code: ${code}, ${message}`)
-        })
+        this._dl.error((code) => {
+            throw new Error(`An error has occurred. Error code: ${code}`);
+        });
     }
 
     /**
@@ -152,7 +152,7 @@ export class Serial {
      */
     getPortsInfo() : Ports[] {
         const buffer = new Uint8Array(2048);
-        const result = this._dl.getAvailablePorts(
+        const result = this._dl.getPortsInfo(
             buffer,
             buffer.length,
             encode(',' + '\0')

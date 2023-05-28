@@ -8,10 +8,6 @@ export function registerSerialFunctions(
     console.log(`Opening: ${path}/${os}.${libSuffix}`);
 
     const serialFunctions = Deno.dlopen(`${path}/${os}.${libSuffix}`, {
-        'serialError': {
-            parameters: ['function'],
-            result: 'void'
-        },
         'serialOpen': {
             parameters: [
                 // Port
@@ -77,7 +73,7 @@ export function registerSerialFunctions(
             // Status code/Bytes written
             result: 'i32'
         },
-        'serialGetAvailablePorts': {
+        'serialGetPortsInfo': {
             parameters: [
                 // Buffer
                 'buffer',
@@ -88,31 +84,27 @@ export function registerSerialFunctions(
             ],
             // Status code/Amount of ports
             result: 'i32'
+        },
+        'serialOnError': {
+            parameters: ['function'],
+            result: 'void'
         }
     }).symbols
 
     return {
         error: (callback) => {
-            serialFunctions.serialError(new Deno.UnsafeCallback({
-                parameters: [
-                    'i32',
-                    'buffer'
-                ],
+            serialFunctions.serialOnError(new Deno.UnsafeCallback({
+                parameters: ['i32'],
                 result: "void",
             } as const,
-            (code, message) => {
-                callback(
-                    code,
-                    Deno.UnsafePointerView.getCString(message!)
-                )
-            }).pointer)
+            (code) => {callback(code)}).pointer)
         },
         open: serialFunctions.serialOpen,
         close:  serialFunctions.serialClose,
         read: serialFunctions.serialRead,
         readUntil: serialFunctions.serialReadUntil,
         write: serialFunctions.serialWrite,
-        getAvailablePorts: serialFunctions.serialGetAvailablePorts
+        getPortsInfo: serialFunctions.serialGetPortsInfo
     }
 }
 

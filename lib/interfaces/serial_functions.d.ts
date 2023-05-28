@@ -5,8 +5,7 @@ import { StopBits } from "../constants/stop_bits.ts";
 
 export interface SerialFunctions {
     error : (callback : (
-        code : number,
-        message : string
+        code : number
     ) => void) => void,
     open : (
         port : Uint8Array,
@@ -35,7 +34,7 @@ export interface SerialFunctions {
         timeout : number,
         multiplier : number
     ) => number,
-    getAvailablePorts : (
+    getPortsInfo : (
         buffer : Uint8Array,
         bufferSize : number,
         separator : Uint8Array
