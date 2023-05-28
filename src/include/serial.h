@@ -31,6 +31,7 @@
 #   define systemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar) unixSystemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar)
 #   define systemWrite(buffer, bufferSize, timeout, multiplier) unixSystemWrite(buffer, bufferSize, timeout, multiplier)
 #   define systemGetAvailablePorts(buffer, bufferSize, separator) unixSystemGetAvailablePorts(buffer, bufferSize, separator)
+#   define systemSetCallbackFunction(f_pointer) unixSetCallbackFunction(f_pointer)
 #endif
 
 #ifdef __cplusplus

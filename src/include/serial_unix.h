@@ -14,15 +14,19 @@
 extern int hSerialPort;
 extern termios2 tty;
 
-auto unixSystemOpen(
+extern void (*callback)(int code, void* buffer);
+
+void unixSetCallbackFunction(void (*func)(int code, void* buffer));
+
+void unixSystemOpen(
     void* port,
     const int baudrate,
     const int dataBits,
     const int parity = 0,
     const int stopBits = 0
-) -> int;
+);
 
-auto unixSystemClose() -> int;
+void unixSystemClose();
 
 auto unixSystemRead(
     void* buffer,

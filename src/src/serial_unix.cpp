@@ -6,13 +6,26 @@
 int hSerialPort;
 termios2 tty;
 
-auto unixSystemOpen(
+void (*callback)(int code, void* buffer);
+
+namespace helper {
+    void Callback(StatusCodes errorCode){        
+        static std::string msg = "";
+        callback(status(errorCode), static_cast<void*>(&msg));
+    }
+}
+
+void windowsSetCallbackFunction(void (*func)(int code, void* buffer)){
+    callback = func;
+}
+
+void unixSystemOpen(
     void* port,
     const int baudrate,
     const int dataBits,
     const int parity,
     const int stopBits
-) -> int {
+) {
     char *portName = static_cast<char*>(port);
     // Open new serial connection
     hSerialPort = open(portName, O_RDWR);
@@ -98,11 +111,11 @@ auto unixSystemOpen(
     // Save tty settings, also checking for error
     ioctl(hSerialPort, TCSETS2, &tty);
 
-    returnStatus(StatusCodes::SUCCESS);
+    // returnStatus(StatusCodes::SUCCESS);
 }
 
-auto unixSystemClose() -> int {
-    return close(hSerialPort);
+void unixSystemClose() {
+    close(hSerialPort);
 }
 
 auto unixSystemRead(
