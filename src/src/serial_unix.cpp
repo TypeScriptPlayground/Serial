@@ -15,11 +15,11 @@ namespace helper {
     }
 }
 
-void unixSystemError(void (*func)(int code)){
+void onErrorUnix(void (*func)(int code)){
     callback = func;
 }
 
-void unixSystemOpen(
+void openUnix(
     void* port,
     const int baudrate,
     const int dataBits,
@@ -114,11 +114,11 @@ void unixSystemOpen(
     // returnStatus(StatusCodes::SUCCESS);
 }
 
-void unixSystemClose() {
+void closeUnix() {
     close(hSerialPort);
 }
 
-auto unixSystemRead(
+auto readUnix(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -127,7 +127,7 @@ auto unixSystemRead(
     return read(hSerialPort, static_cast<char*>(buffer), bufferSize);
 }
 
-auto unixSystemReadUntil(
+auto readUntilUnix(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -137,7 +137,7 @@ auto unixSystemReadUntil(
     return 0;
 }
 
-auto unixSystemWrite(
+auto writeUnix(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -149,7 +149,7 @@ auto unixSystemWrite(
     return write(hSerialPort, tmp.c_str(), tmp.length() + 1);
 }
 
-// auto unixSystemGetAvailablePorts(
+// auto getPortsInfoUnix(
 //     void* buffer,
 //     const int bufferSize,
 //     void* separator

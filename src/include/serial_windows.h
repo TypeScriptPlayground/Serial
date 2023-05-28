@@ -12,9 +12,9 @@ extern HANDLE hSerialPort;
 extern DCB dcbSerialParams;
 extern COMMTIMEOUTS timeouts;
 
-void windowsSystemError(void (*func)(int code));
+void onErrorWindows(void (*func)(int code));
 
-void windowsSystemOpen(
+void openWindows(
     void* port,
     const int baudrate,
     const int dataBits,
@@ -22,16 +22,16 @@ void windowsSystemOpen(
     const int stopBits = 0
 );
 
-void windowsSystemClose();
+void closeWindows();
 
-auto windowsSystemRead(
+auto readWindows(
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier
 ) -> int;
 
-auto windowsSystemReadUntil(
+auto readUntilWindows(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -39,14 +39,14 @@ auto windowsSystemReadUntil(
     void* untilChar
 ) -> int;
 
-auto windowsSystemWrite(
+auto writeWindows(
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier
 ) -> int;
 
-auto windowsSystemGetAvailablePorts(
+auto getPortsInfoWindows(
     void* buffer,
     const int bufferSize,
     void* separator

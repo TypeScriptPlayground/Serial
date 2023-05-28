@@ -10,23 +10,7 @@ std::string data;
 
 void (*callback)(int code);
 
-void windowsSystemError(void (*func)(int code)){
-    callback = func;
-}
-
-
-
-/**
-* @fn auto open(void* port, const int baudrate, const int dataBits, const int parity, const int stopBits) -> int
-* @brief Opens the specified connection to a serial device.
-* @param port The port to open the serial connection to
-* @param baudrate The baudrate for the serial connection when reading/writing
-* @param dataBits The data bits
-* @param parity The parity bits
-* @param stopBits The stop bits
-* @return Returns the current status code
-*/
-void windowsSystemOpen(
+void openWindows(
     void* port,
     const int baudrate,
     const int dataBits,
@@ -91,12 +75,7 @@ void windowsSystemOpen(
     }
 }
 
-/**
-* @fn auto close() -> int
-* @brief Closes the specified connection to a serial device.
-* @return Returns the current status code
-*/
-void windowsSystemClose() {
+void closeWindows() {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         callback(status(StatusCodes::INVALID_HANDLE_ERROR));
@@ -108,17 +87,7 @@ void windowsSystemClose() {
     }
 }
 
-/**
-* @fn auto read(void* buffer, const int bufferSize, const int timeout, const int multiplier) -> int
-* @brief Reads the specified number of bytes into the buffer.
-* **It is not guaranteed that the complete buffer will be fully read.**
-* @param buffer The buffer in which the bytes should be read into
-* @param bufferSize The size of the buffer
-* @param timeout Timeout to cancel the read
-* @param multiplier The time multiplier between reading
-* @return Returns the current status code (negative) or number of bytes read
-*/
-auto windowsSystemRead(
+auto readWindows(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -148,18 +117,7 @@ auto windowsSystemRead(
     return bytesRead;
 }
 
-/**
-* @fn auto readUntil(void* buffer, const int bufferSize, const int timeout, const int mutilplier, void* searchString) -> int
-* @brief Reads until the specified string is found. If the specified string is not found, the buffer is read full until there are no more bytes to read.
-* **It is not guaranteed that the complete buffer will be fully read.**
-* @param buffer The buffer in which the bytes should be read into
-* @param bufferSize The size of the buffer
-* @param timeout Timeout to cancel the read
-* @param multiplier The time multiplier between reading
-* @param searchString The string to search for
-* @return Returns the current status code (negative) or number of bytes read
-*/
-auto windowsSystemReadUntil(
+auto readUntilWindows(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -203,17 +161,7 @@ auto windowsSystemReadUntil(
     return data.length();
 }
 
-/**
-* @fn auto write(void* buffer, const int bufferSize, const int timeout, const int multiplier) -> int
-* @brief Writes the buffer to the serial device.
-* **It is not guaranteed that the complete buffer will be fully written.**
-* @param buffer The buffer in which the bytes should be read into
-* @param bufferSize The size of the buffer
-* @param timeout Timeout to cancel the read
-* @param multiplieer The time multiplier between writing
-* @return Returns the current status code (negative) or number of bytes written
-*/
-auto windowsSystemWrite(void* buffer, const int bufferSize, const int timeout, const int multiplier) -> int {
+auto writeWindows(void* buffer, const int bufferSize, const int timeout, const int multiplier) -> int {
     DWORD bytesWritten;
 
     timeouts.WriteTotalTimeoutConstant = timeout;
@@ -232,15 +180,7 @@ auto windowsSystemWrite(void* buffer, const int bufferSize, const int timeout, c
     return bytesWritten;
 }
 
-/**
-* @fn auto getAvailablePorts(void* buffer, const int bufferSize, void* separator) -> int
-* @brief Get all the available serial ports.
-* @param buffer The buffer in which the bytes should be read into
-* @param bufferSize The size of the buffer
-* @param separator The separator for the array buffer
-* @return Returns the current status code (negative) or number of ports found
-*/
-auto windowsSystemGetAvailablePorts(
+auto getPortsInfoWindows(
     void* buffer,
     const int bufferSize,
     void* separator
@@ -277,6 +217,10 @@ auto windowsSystemGetAvailablePorts(
     memcpy(buffer, result.c_str(), result.length() + 1);
     
     return portsCounter;
+}
+
+void onErrorWindows(void (*func)(int code)){
+    callback = func;
 }
 
 #endif

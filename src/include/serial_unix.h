@@ -16,9 +16,9 @@ extern termios2 tty;
 
 extern void (*callback)(int code);
 
-void unixSystemError(void (*func)(int code));
+void onErrorUnix(void (*func)(int code));
 
-void unixSystemOpen(
+void openUnix(
     void* port,
     const int baudrate,
     const int dataBits,
@@ -26,16 +26,16 @@ void unixSystemOpen(
     const int stopBits = 0
 );
 
-void unixSystemClose();
+void closeUnix();
 
-auto unixSystemRead(
+auto readUnix(
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier
 ) -> int;
 
-auto unixSystemReadUntil(
+auto readUntilUnix(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -43,14 +43,14 @@ auto unixSystemReadUntil(
     void* untilChar
 ) -> int;
 
-auto unixSystemWrite(
+auto writeUnix(
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier
 ) -> int;
 
-auto unixSystemGetAvailablePorts(
+auto getPortsInfoUnix(
     void* buffer,
     const int bufferSize,
     void* separator

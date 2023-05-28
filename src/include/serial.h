@@ -11,34 +11,32 @@
 #endif
 
 // Windows
-#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 #   include "serial_windows.h"
-#   define systemOpen(port, baudrate, dataBits, parity, stopBits) windowsSystemOpen(port, baudrate, dataBits, parity, stopBits)
-#   define systemClose() windowsSystemClose()
-#   define systemRead(buffer, bufferSize, timeout, multiplier) windowsSystemRead(buffer, bufferSize, timeout, multiplier)
-#   define systemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar) windowsSystemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar)
-#   define systemWrite(buffer, bufferSize, timeout, multiplier) windowsSystemWrite(buffer, bufferSize, timeout, multiplier)
-#   define systemGetAvailablePorts(buffer, bufferSize, separator) windowsSystemGetAvailablePorts(buffer, bufferSize, separator)
-#   define systemError(f_pointer) windowsSystemError(f_pointer)
+#   define OPEN(port, baudrate, dataBits, parity, stopBits) openWindows(port, baudrate, dataBits, parity, stopBits)
+#   define CLOSE() closeWindows()
+#   define READ(buffer, bufferSize, timeout, multiplier) readWindows(buffer, bufferSize, timeout, multiplier)
+#   define READ_UNTIL(buffer, bufferSize, timeout, multiplier, untilChar) readUntilWindows(buffer, bufferSize, timeout, multiplier, untilChar)
+#   define WRITE(buffer, bufferSize, timeout, multiplier) writeWindows(buffer, bufferSize, timeout, multiplier)
+#   define GET_PORTS_INFO(buffer, bufferSize, separator) getPortsInfoWindows(buffer, bufferSize, separator)
+#   define ON_ERROR(f_pointer) onErrorWindows(f_pointer)
 #endif
 
 // Linux, Apple
-#if defined(__unix__) || defined(__unix) || defined(__APPLE__)
+#if defined(__unix) || defined(__unix__) || defined(__APPLE__)
 #   include "serial_unix.h"
-#   define systemOpen(port, baudrate, dataBits, parity, stopBits) unixSystemOpen(port, baudrate, dataBits, parity, stopBits)
-#   define systemClose() unixSystemClose()
-#   define systemRead(buffer, bufferSize, timeout, multiplier) unixSystemRead(buffer, bufferSize, timeout, multiplier)
-#   define systemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar) unixSystemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar)
-#   define systemWrite(buffer, bufferSize, timeout, multiplier) unixSystemWrite(buffer, bufferSize, timeout, multiplier)
-#   define systemGetAvailablePorts(buffer, bufferSize, separator) unixSystemGetAvailablePorts(buffer, bufferSize, separator)
-#   define systemError(f_pointer) unixSystemError(f_pointer)
+#   define OPEN(port, baudrate, dataBits, parity, stopBits) openUnix(port, baudrate, dataBits, parity, stopBits)
+#   define CLOSE() closeUnix()
+#   define READ(buffer, bufferSize, timeout, multiplier) readUnix(buffer, bufferSize, timeout, multiplier)
+#   define READ_UNTIL(buffer, bufferSize, timeout, multiplier, untilChar) readUntilUnix(buffer, bufferSize, timeout, multiplier, untilChar)
+#   define WRITE(buffer, bufferSize, timeout, multiplier) writeUnix(buffer, bufferSize, timeout, multiplier)
+#   define GET_PORTS_INFO(buffer, bufferSize, separator) getPortsInfoUnix(buffer, bufferSize, separator)
+#   define ON_ERROR(f_pointer) onErrorUnix(f_pointer)
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-    MODULE_API auto serialError(void (*func)(int code)) -> void;
 
     MODULE_API void serialOpen(
         void* port,
@@ -77,6 +75,8 @@ extern "C" {
         const int bufferSize,
         void* separator
     ) -> int;
+    
+    MODULE_API auto serialOnError(void (*func)(int code)) -> void;
 
 #ifdef __cplusplus
 }
