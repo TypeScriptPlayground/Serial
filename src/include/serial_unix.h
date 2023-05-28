@@ -16,7 +16,7 @@ extern termios2 tty;
 
 extern void (*callback)(int code, void* buffer);
 
-void unixSetCallbackFunction(void (*func)(int code, void* buffer));
+void unixSystemError(void (*func)(int code, void* buffer));
 
 void unixSystemOpen(
     void* port,
