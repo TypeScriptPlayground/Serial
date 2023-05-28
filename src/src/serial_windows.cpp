@@ -1,3 +1,4 @@
+#include <string>
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #include "serial_windows.h"
 
@@ -7,9 +8,38 @@ DCB dcbSerialParams = {0};
 COMMTIMEOUTS timeouts = {0};
 std::string data;
 
-void (*callback)(int code, void* buffer, int size);
+void (*callback)(int code, void* buffer);
 
-void windowsSetCallbackFunction(void (*func)(int code, void* buffer, int size)){
+namespace helper {
+    void Callback(StatusCodes errorCode){
+        DWORD code = GetLastError();
+        LPSTR buffer = nullptr;
+
+        DWORD result = FormatMessageA(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+            nullptr,
+            code,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            reinterpret_cast<LPSTR>(&buffer),
+            0,
+            nullptr);
+
+        static std::string errorMessage;
+        if (result != 0 && buffer != nullptr)
+        {
+            errorMessage = buffer;
+            LocalFree(buffer);
+        }
+        else
+        {
+            errorMessage = "Unknown error";
+        }
+        
+        callback(status(errorCode), static_cast<void*>(&errorMessage));
+    }
+}
+
+void windowsSetCallbackFunction(void (*func)(int code, void* buffer)){
     callback = func;
 }
 
@@ -25,17 +55,13 @@ void windowsSetCallbackFunction(void (*func)(int code, void* buffer, int size)){
 * @param stopBits The stop bits
 * @return Returns the current status code
 */
-auto windowsSystemOpen(
+void windowsSystemOpen(
     void* port,
     const int baudrate,
     const int dataBits,
     const int parity,
     const int stopBits
-) -> int {
-
-    static std::string str = "hey";
-
-    callback(69, static_cast<void*>(&str), str.length());
+) {
 
     char *portName = static_cast<char*>(port);
 
@@ -53,13 +79,13 @@ auto windowsSystemOpen(
 
     // Error if open fails
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        return status(StatusCodes::INVALID_HANDLE_ERROR);
+        helper::Callback(StatusCodes::INVALID_HANDLE_ERROR);
     }
 
     // Error if configuration get fails
     if (!GetCommState(hSerialPort, &dcbSerialParams)) {
         CloseHandle(hSerialPort);
-        return status(StatusCodes::GET_STATE_ERROR);
+        helper::Callback(StatusCodes::GET_STATE_ERROR);
     }
 
     dcbSerialParams.BaudRate = baudrate;
@@ -71,10 +97,10 @@ auto windowsSystemOpen(
     if (!SetCommState(hSerialPort, &dcbSerialParams)) {
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
-            return status(StatusCodes::CLOSE_HANDLE_ERROR);
+            helper::Callback(StatusCodes::CLOSE_HANDLE_ERROR);
         }
         
-        return status(StatusCodes::SET_STATE_ERROR);
+        helper::Callback(StatusCodes::SET_STATE_ERROR);
     }
     
     timeouts.ReadIntervalTimeout = 50;
@@ -87,13 +113,13 @@ auto windowsSystemOpen(
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
-            return status(StatusCodes::CLOSE_HANDLE_ERROR);
+            helper::Callback(StatusCodes::CLOSE_HANDLE_ERROR);
         }
         
-        return status(StatusCodes::SET_TIMEOUT_ERROR);
+        helper::Callback(StatusCodes::SET_TIMEOUT_ERROR);
     }
 
-    return status(StatusCodes::SUCCESS);
+    helper::Callback(StatusCodes::SUCCESS);
 }
 
 /**
@@ -101,18 +127,18 @@ auto windowsSystemOpen(
 * @brief Closes the specified connection to a serial device.
 * @return Returns the current status code
 */
-auto windowsSystemClose() -> int {
+void windowsSystemClose() {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        return status(StatusCodes::INVALID_HANDLE_ERROR);
+        helper::Callback(StatusCodes::INVALID_HANDLE_ERROR);
     }
 
     // Error if close fails
     if (!CloseHandle(hSerialPort)) {
-        return status(StatusCodes::CLOSE_HANDLE_ERROR);
+        helper::Callback(StatusCodes::CLOSE_HANDLE_ERROR);
     }
 
-    return status(StatusCodes::SUCCESS);
+    helper::Callback(StatusCodes::SUCCESS);
 }
 
 /**

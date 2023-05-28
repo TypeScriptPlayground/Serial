@@ -1,20 +1,20 @@
 #include "serial.h"
 
-void serialSetCallBackFunction(void (*func)(int code, void* buffer, int size)) {
+void serialSetCallBackFunction(void (*func)(int code, void* buffer)) {
     systemSetCallbackFunction(func);
 }
 
-auto serialOpen(
+void serialOpen(
     void* port,
     const int baudrate,
     const int dataBits,
     const int parity,
     const int stopBits
-) -> int {
+) {
     return systemOpen(port, baudrate, dataBits, parity, stopBits);
 }
 
-auto serialClose() -> int {
+void serialClose() {
     return systemClose();
 }
 
