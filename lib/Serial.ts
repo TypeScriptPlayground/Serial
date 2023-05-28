@@ -22,6 +22,9 @@ export class Serial {
     constructor() {
         this._isOpen = false;
         this._dl = loadBinaryForOS(pathToBinariesDirectory, Deno.build.os);
+        this._dl.error((code, message) => {
+            throw new Error(`An error has occurred. Error code: ${code}, ${message}`)
+        })
     }
 
     /**
