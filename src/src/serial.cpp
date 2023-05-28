@@ -1,6 +1,6 @@
 #include "serial.h"
 
-void serialError(void (*func)(int code, void* buffer)) {
+void serialError(void (*func)(int code)) {
     systemError(func);
 }
 

@@ -38,7 +38,7 @@
 extern "C" {
 #endif
 
-    MODULE_API auto serialError(void (*func)(int code, void* buffer)) -> void;
+    MODULE_API auto serialError(void (*func)(int code)) -> void;
 
     MODULE_API void serialOpen(
         void* port,

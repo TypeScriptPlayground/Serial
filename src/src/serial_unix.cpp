@@ -6,7 +6,7 @@
 int hSerialPort;
 termios2 tty;
 
-void (*callback)(int code, void* buffer);
+void (*callback)(int code);
 
 namespace helper {
     void Callback(StatusCodes errorCode){        
@@ -15,7 +15,7 @@ namespace helper {
     }
 }
 
-void unixSystemError(void (*func)(int code, void* buffer)){
+void unixSystemError(void (*func)(int code)){
     callback = func;
 }
 

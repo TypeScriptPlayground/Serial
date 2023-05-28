@@ -14,9 +14,9 @@
 extern int hSerialPort;
 extern termios2 tty;
 
-extern void (*callback)(int code, void* buffer);
+extern void (*callback)(int code);
 
-void unixSystemError(void (*func)(int code, void* buffer));
+void unixSystemError(void (*func)(int code));
 
 void unixSystemOpen(
     void* port,

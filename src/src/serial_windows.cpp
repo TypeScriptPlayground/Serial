@@ -8,49 +8,9 @@ DCB dcbSerialParams = {0};
 COMMTIMEOUTS timeouts = {0};
 std::string data;
 
-void (*callback)(int code, void* buffer);
+void (*callback)(int code);
 
-namespace helper {
-
-std::string GetLastErrorMessage()
-{
-    DWORD errorCode = GetLastError();
-    LPSTR buffer = nullptr;
-
-    DWORD result = FormatMessageA(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        nullptr,
-        errorCode,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        reinterpret_cast<LPSTR>(&buffer),
-        0,
-        nullptr);
-
-    std::string errorMessage;
-    if (result != 0 && buffer != nullptr)
-    {
-        errorMessage = buffer;
-        LocalFree(buffer);
-    }
-    else
-    {
-        errorMessage = "Unknown error";
-    }
-
-    return errorMessage;
-}
-
-void Callback(StatusCodes errorCode){
-    static std::string errorMsg = GetLastErrorMessage();
-    errorMsg += '\0';    
-
-    errorMsg = std::string("ich bin ein test callback");
-
-    callback(status(errorCode), static_cast<void*>(&errorMsg));
-}
-}
-
-void windowsSystemError(void (*func)(int code, void* buffer)){
+void windowsSystemError(void (*func)(int code)){
     callback = func;
 }
 
@@ -90,13 +50,13 @@ void windowsSystemOpen(
 
     // Error if open fails
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        helper::Callback(StatusCodes::INVALID_HANDLE_ERROR);
+        callback(status(StatusCodes::INVALID_HANDLE_ERROR));
     }
 
     // Error if configuration get fails
     if (!GetCommState(hSerialPort, &dcbSerialParams)) {
         CloseHandle(hSerialPort);
-        helper::Callback(StatusCodes::GET_STATE_ERROR);
+        callback(status(StatusCodes::GET_STATE_ERROR));
     }
 
     dcbSerialParams.BaudRate = baudrate;
@@ -108,10 +68,10 @@ void windowsSystemOpen(
     if (!SetCommState(hSerialPort, &dcbSerialParams)) {
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
-            helper::Callback(StatusCodes::CLOSE_HANDLE_ERROR);
+            callback(status(StatusCodes::CLOSE_HANDLE_ERROR));
         }
         
-        helper::Callback(StatusCodes::SET_STATE_ERROR);
+        callback(status(StatusCodes::SET_STATE_ERROR));
     }
     
     timeouts.ReadIntervalTimeout = 50;
@@ -124,10 +84,10 @@ void windowsSystemOpen(
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
-            helper::Callback(StatusCodes::CLOSE_HANDLE_ERROR);
+            callback(status(StatusCodes::CLOSE_HANDLE_ERROR));
         }
         
-        helper::Callback(StatusCodes::SET_TIMEOUT_ERROR);
+        callback(status(StatusCodes::SET_TIMEOUT_ERROR));
     }
 }
 
@@ -139,12 +99,12 @@ void windowsSystemOpen(
 void windowsSystemClose() {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        helper::Callback(StatusCodes::INVALID_HANDLE_ERROR);
+        callback(status(StatusCodes::INVALID_HANDLE_ERROR));
     }
 
     // Error if close fails
     if (!CloseHandle(hSerialPort)) {
-        helper::Callback(StatusCodes::CLOSE_HANDLE_ERROR);
+        callback(status(StatusCodes::CLOSE_HANDLE_ERROR));
     }
 }
 
