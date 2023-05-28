@@ -9,6 +9,17 @@ std::string data;
 
 void (*callback)(int errorCode);
 
+bool isSerialPortClosed(HANDLE hSerialPort) {
+    DWORD modemStatus;
+    if (!GetCommModemStatus(hSerialPort, &modemStatus)) {
+        // Fehler beim Abrufen des Modemstatus
+        return false;
+    }
+    
+    // Überprüfen, ob die Verbindung geschlossen wurde
+    return (modemStatus == 0x00);
+}
+
 void openWindows(
     void* port,
     const int baudrate,
@@ -130,7 +141,7 @@ auto readUntilWindows(
     const int multiplier,
     void* searchString
 ) -> int {
-
+    // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         callback(status(StatusCodes::INVALID_HANDLE_ERROR));
         return 0;
@@ -170,9 +181,14 @@ auto readUntilWindows(
     return data.length();
 }
 
-auto writeWindows(void* buffer, const int bufferSize, const int timeout, const int multiplier) -> int {
-    // Error if handle is invalid
-    if (hSerialPort == INVALID_HANDLE_VALUE) {
+auto writeWindows(
+    void* buffer,
+    const int bufferSize,
+    const int timeout,
+    const int multiplier
+) -> int {
+
+    if (isSerialPortClosed(hSerialPort)){
         callback(status(StatusCodes::INVALID_HANDLE_ERROR));
         return 0;
     }
