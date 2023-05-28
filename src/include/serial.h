@@ -70,7 +70,7 @@ extern "C" {
         const int multiplier
     ) -> int;
 
-    MODULE_API auto serialGetAvailablePorts(
+    MODULE_API auto serialGetPortsInfo(
         void* buffer,
         const int bufferSize,
         void* separator
