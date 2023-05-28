@@ -39,7 +39,7 @@ namespace helper {
     }
 }
 
-void windowsError(void (*func)(int code, void* buffer)){
+void windowsSystemError(void (*func)(int code, void* buffer)){
     callback = func;
 }
 
