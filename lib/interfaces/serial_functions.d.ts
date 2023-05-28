@@ -4,6 +4,10 @@ import { Parity } from "../constants/parity.ts";
 import { StopBits } from "../constants/stop_bits.ts";
 
 export interface SerialFunctions {
+    error : (callback : (
+        code : number,
+        message : string
+    ) => void) => void,
     open : (
         port : Uint8Array,
         baudrate : Baudrate,
