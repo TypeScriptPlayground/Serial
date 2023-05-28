@@ -13,7 +13,7 @@ bool isSerialPortClosed(HANDLE hSerialPort) {
     DWORD modemStatus;
     if (!GetCommModemStatus(hSerialPort, &modemStatus)) {
         // Fehler beim Abrufen des Modemstatus
-        return false;
+        return true;
     }
     
     // Überprüfen, ob die Verbindung geschlossen wurde
