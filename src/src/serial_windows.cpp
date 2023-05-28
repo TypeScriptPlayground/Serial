@@ -8,7 +8,7 @@ DCB dcbSerialParams = {0};
 COMMTIMEOUTS timeouts = {0};
 std::string data;
 
-void (*callback)(int code);
+void (*callback)(int errorCode);
 
 void openWindows(
     void* port,
@@ -219,7 +219,7 @@ auto getPortsInfoWindows(
     return portsCounter;
 }
 
-void onErrorWindows(void (*func)(int code)){
+void onErrorWindows(void (*func)(int errorCode)){
     callback = func;
 }
 
