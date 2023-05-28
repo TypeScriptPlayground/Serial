@@ -1,3 +1,4 @@
+#include <minwindef.h>
 #include <string>
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #include "serial_windows.h"
@@ -34,13 +35,17 @@ void openWindows(
 
     // Error if open fails
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        callback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        CALLBACK_STOP(StatusCodes::INVALID_HANDLE_ERROR);
     }
 
     // Error if configuration get fails
     if (!GetCommState(hSerialPort, &dcbSerialParams)) {
-        CloseHandle(hSerialPort);
-        callback(status(StatusCodes::GET_STATE_ERROR));
+        // Error if close fails
+        if (!CloseHandle(hSerialPort)) {
+            CALLBACK_STOP(StatusCodes::CLOSE_HANDLE_ERROR);
+        }
+
+        CALLBACK_STOP(StatusCodes::GET_STATE_ERROR);
     }
 
     dcbSerialParams.BaudRate = baudrate;
@@ -52,10 +57,10 @@ void openWindows(
     if (!SetCommState(hSerialPort, &dcbSerialParams)) {
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
-            callback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+            CALLBACK_STOP(StatusCodes::CLOSE_HANDLE_ERROR);
         }
         
-        callback(status(StatusCodes::SET_STATE_ERROR));
+        CALLBACK_STOP(StatusCodes::SET_STATE_ERROR);
     }
     
     timeouts.ReadIntervalTimeout = 50;
@@ -68,22 +73,22 @@ void openWindows(
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
-            callback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+            CALLBACK_STOP(StatusCodes::CLOSE_HANDLE_ERROR);
         }
         
-        callback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        CALLBACK_STOP(StatusCodes::SET_TIMEOUT_ERROR);
     }
 }
 
 void closeWindows() {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        callback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        CALLBACK_STOP(StatusCodes::INVALID_HANDLE_ERROR);
     }
 
     // Error if close fails
     if (!CloseHandle(hSerialPort)) {
-        callback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+        CALLBACK_STOP(StatusCodes::CLOSE_HANDLE_ERROR);
     }
 }
 
@@ -96,6 +101,7 @@ auto readWindows(
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         callback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        return 0;
     }
 
     timeouts.ReadIntervalTimeout = timeout;
@@ -105,6 +111,7 @@ auto readWindows(
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
         callback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        return 0;
     }
 
     DWORD bytesRead = 0;
@@ -112,6 +119,7 @@ auto readWindows(
     // Error if read fails
     if (!ReadFile(hSerialPort, buffer, bufferSize, &bytesRead, NULL)) {
         callback(status(StatusCodes::READ_ERROR));
+        return 0;
     }
     
     return bytesRead;
@@ -127,6 +135,7 @@ auto readUntilWindows(
 
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         callback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        return 0;
     }
 
     timeouts.ReadIntervalTimeout = timeout;
@@ -136,6 +145,7 @@ auto readUntilWindows(
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
         callback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        return 0;
     }
 
     data = "";
@@ -147,6 +157,7 @@ auto readUntilWindows(
         // Error if read fails
         if (!ReadFile(hSerialPort, bufferChar, sizeof(bufferChar), &bytesRead, NULL)) {
             callback(status(StatusCodes::READ_ERROR));
+            return 0;
         }
 
         if (bytesRead == 0) {
@@ -170,11 +181,13 @@ auto writeWindows(void* buffer, const int bufferSize, const int timeout, const i
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
         callback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        return 0;
     }
 
     // Error if write fails
     if (!WriteFile(hSerialPort, buffer, bufferSize, &bytesWritten, NULL)) {
         callback(status(StatusCodes::WRITE_ERROR));
+        return 0;
     }
     
     return bytesWritten;

@@ -8,11 +8,11 @@
 
 extern void (*callback)(int code);
 
+#define CALLBACK_STOP(errorCode) callback(status(errorCode)); return;
+
 extern HANDLE hSerialPort;
 extern DCB dcbSerialParams;
 extern COMMTIMEOUTS timeouts;
-
-void onErrorWindows(void (*func)(int code));
 
 void openWindows(
     void* port,
@@ -51,5 +51,7 @@ auto getPortsInfoWindows(
     const int bufferSize,
     void* separator
 ) -> int;
+
+void onErrorWindows(void (*func)(int code));
 
 #endif
