@@ -41,7 +41,8 @@ std::string GetLastErrorMessage()
 }
 
 void Callback(StatusCodes errorCode){
-    static auto errorMsg = GetLastErrorMessage();    
+    static std::string errorMsg = GetLastErrorMessage();
+    errorMsg += '\0';    
     callback(status(errorCode), static_cast<void*>(&errorMsg));
 }
 }
