@@ -11,32 +11,39 @@ std::string data;
 void (*callback)(int code, void* buffer);
 
 namespace helper {
-    void Callback(StatusCodes errorCode){
-        DWORD code = GetLastError();
-        LPSTR buffer = nullptr;
 
-        DWORD result = FormatMessageA(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            nullptr,
-            code,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            reinterpret_cast<LPSTR>(&buffer),
-            0,
-            nullptr);
+std::string GetLastErrorMessage()
+{
+    DWORD errorCode = GetLastError();
+    LPSTR buffer = nullptr;
 
-        static std::string errorMessage;
-        if (result != 0 && buffer != nullptr)
-        {
-            errorMessage = std::string(buffer);
-            LocalFree(buffer);
-        }
-        else
-        {
-            errorMessage = "Unknown error";
-        }
-        
-        callback(status(errorCode), static_cast<void*>(&errorMessage));
+    DWORD result = FormatMessageA(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        nullptr,
+        errorCode,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        reinterpret_cast<LPSTR>(&buffer),
+        0,
+        nullptr);
+
+    std::string errorMessage;
+    if (result != 0 && buffer != nullptr)
+    {
+        errorMessage = buffer;
+        LocalFree(buffer);
     }
+    else
+    {
+        errorMessage = "Unknown error";
+    }
+
+    return errorMessage;
+}
+
+void Callback(StatusCodes errorCode){
+    static auto errorMsg = GetLastErrorMessage();    
+    callback(status(errorCode), static_cast<void*>(&errorMsg));
+}
 }
 
 void windowsSystemError(void (*func)(int code, void* buffer)){
