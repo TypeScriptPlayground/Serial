@@ -43,15 +43,13 @@ export class Serial {
         baudrate : Baudrate,
         serialOptions? : SerialOptions
     ) : void {
-        const result = this._dl.open(
+        this._dl.open(
             encode(port + '\0'),
             baudrate,
             serialOptions?.dataBits || dataBits.EIGHT,
             serialOptions?.parity || parity.NONE,
             serialOptions?.stopBits || stopBits.ONE
         );
-        
-        checkForErrorCode(result);
 
         this._isOpen = true;
     }
@@ -60,9 +58,7 @@ export class Serial {
      * Closes the serial connection.
      */
     close() {
-        const result = this._dl.close();
-
-        checkForErrorCode(result);
+        this._dl.close();
 
         this._isOpen = false;
     }
