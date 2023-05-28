@@ -1,5 +1,3 @@
-#include <minwindef.h>
-#include <string>
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #include "serial_windows.h"
 
