@@ -43,6 +43,9 @@ std::string GetLastErrorMessage()
 void Callback(StatusCodes errorCode){
     static std::string errorMsg = GetLastErrorMessage();
     errorMsg += '\0';    
+
+    errorMsg = std::string("ich bin ein test callback");
+
     callback(status(errorCode), static_cast<void*>(&errorMsg));
 }
 }
