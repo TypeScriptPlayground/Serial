@@ -102,7 +102,7 @@ export function registerSerialFunctions(
         console.log('Callback from C++ with code:', code, '\nmessage:', Deno.UnsafePointerView.getCString(message!));
     });
 
-    serialFunctions.serialSetCallBackFunction(callback.pointer);
+    serialFunctions.serialError(callback.pointer);
     
     return {
         open: serialFunctions.serialOpen,
