@@ -7,9 +7,9 @@ DCB dcbSerialParams = {0};
 COMMTIMEOUTS timeouts = {0};
 std::string data;
 
-void (*callback)(int code);
+void (*callback)(int code, void* buffer, int size);
 
-void windowsSetCallbackFunction(void (*func)(int code)){
+void windowsSetCallbackFunction(void (*func)(int code, void* buffer, int size)){
     callback = func;
 }
 
@@ -33,7 +33,9 @@ auto windowsSystemOpen(
     const int stopBits
 ) -> int {
 
-    callback(69);
+    static std::string str = "hey";
+
+    callback(69, static_cast<void*>(&str), str.length());
 
     char *portName = static_cast<char*>(port);
 
