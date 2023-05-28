@@ -1,5 +1,9 @@
 #include "serial.h"
-// test for ci
+
+void serialSetCallBackFunction(void (*func)()) {
+    systemSetCallbackFunction(func);
+}
+
 auto serialOpen(
     void* port,
     const int baudrate,

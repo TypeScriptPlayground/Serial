@@ -7,6 +7,14 @@ DCB dcbSerialParams = {0};
 COMMTIMEOUTS timeouts = {0};
 std::string data;
 
+void (*callback)();
+
+void windowsSetCallbackFunction(void (*func)()){
+    callback = func;
+}
+
+
+
 /**
 * @fn auto open(void* port, const int baudrate, const int dataBits, const int parity, const int stopBits) -> int
 * @brief Opens the specified connection to a serial device.
@@ -25,6 +33,8 @@ auto windowsSystemOpen(
     const int stopBits
 ) -> int {
 
+    callback();
+
     char *portName = static_cast<char*>(port);
 
     dcbSerialParams.DCBlength = sizeof(DCB);
@@ -41,13 +51,13 @@ auto windowsSystemOpen(
 
     // Error if open fails
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
+        return status(StatusCodes::INVALID_HANDLE_ERROR);
     }
 
     // Error if configuration get fails
     if (!GetCommState(hSerialPort, &dcbSerialParams)) {
         CloseHandle(hSerialPort);
-        returnStatus(StatusCodes::GET_STATE_ERROR);
+        return status(StatusCodes::GET_STATE_ERROR);
     }
 
     dcbSerialParams.BaudRate = baudrate;
@@ -57,8 +67,12 @@ auto windowsSystemOpen(
 
     // Error if configuration set fails
     if (!SetCommState(hSerialPort, &dcbSerialParams)) {
-        CloseHandle(hSerialPort);
-        returnStatus(StatusCodes::SET_STATE_ERROR);
+        // Error if close fails
+        if (!CloseHandle(hSerialPort)) {
+            return status(StatusCodes::CLOSE_HANDLE_ERROR);
+        }
+        
+        return status(StatusCodes::SET_STATE_ERROR);
     }
     
     timeouts.ReadIntervalTimeout = 50;
@@ -69,11 +83,15 @@ auto windowsSystemOpen(
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        CloseHandle(hSerialPort);
-        returnStatus(StatusCodes::SET_TIMEOUT_ERROR);
+        // Error if close fails
+        if (!CloseHandle(hSerialPort)) {
+            return status(StatusCodes::CLOSE_HANDLE_ERROR);
+        }
+        
+        return status(StatusCodes::SET_TIMEOUT_ERROR);
     }
 
-    returnStatus(StatusCodes::SUCCESS);
+    return status(StatusCodes::SUCCESS);
 }
 
 /**
@@ -84,15 +102,15 @@ auto windowsSystemOpen(
 auto windowsSystemClose() -> int {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
+        return status(StatusCodes::INVALID_HANDLE_ERROR);
     }
 
     // Error if close fails
     if (!CloseHandle(hSerialPort)) {
-        returnStatus(StatusCodes::CLOSE_HANDLE_ERROR);
+        return status(StatusCodes::CLOSE_HANDLE_ERROR);
     }
 
-    returnStatus(StatusCodes::SUCCESS);
+    return status(StatusCodes::SUCCESS);
 }
 
 /**
@@ -113,7 +131,7 @@ auto windowsSystemRead(
 ) -> int {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
+        return status(StatusCodes::INVALID_HANDLE_ERROR);
     }
 
     timeouts.ReadIntervalTimeout = timeout;
@@ -122,14 +140,14 @@ auto windowsSystemRead(
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        returnStatus(StatusCodes::SET_TIMEOUT_ERROR);
+        return status(StatusCodes::SET_TIMEOUT_ERROR);
     }
 
     DWORD bytesRead;
 
     // Error if read fails
     if (!ReadFile(hSerialPort, buffer, bufferSize, &bytesRead, NULL)) {
-        returnStatus(StatusCodes::READ_ERROR);
+        return status(StatusCodes::READ_ERROR);
     }
     
     return bytesRead;
@@ -155,7 +173,7 @@ auto windowsSystemReadUntil(
 ) -> int {
 
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
+        return status(StatusCodes::INVALID_HANDLE_ERROR);
     }
 
     timeouts.ReadIntervalTimeout = timeout;
@@ -164,7 +182,7 @@ auto windowsSystemReadUntil(
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        returnStatus(StatusCodes::SET_TIMEOUT_ERROR);
+        return status(StatusCodes::SET_TIMEOUT_ERROR);
     }
 
     data = "";
@@ -175,7 +193,7 @@ auto windowsSystemReadUntil(
 
         // Error if read fails
         if (!ReadFile(hSerialPort, bufferChar, sizeof(bufferChar), &bytesRead, NULL)) {
-            returnStatus(StatusCodes::READ_ERROR);
+            return status(StatusCodes::READ_ERROR);
         }
 
         if (bytesRead == 0) {
@@ -208,12 +226,12 @@ auto windowsSystemWrite(void* buffer, const int bufferSize, const int timeout, c
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        returnStatus(StatusCodes::SET_TIMEOUT_ERROR);
+        return status(StatusCodes::SET_TIMEOUT_ERROR);
     }
 
     // Error if write fails
     if (!WriteFile(hSerialPort, buffer, bufferSize, &bytesWritten, NULL)) {
-        returnStatus(StatusCodes::WRITE_ERROR);
+        return status(StatusCodes::WRITE_ERROR);
     }
     
     return bytesWritten;
@@ -258,7 +276,7 @@ auto windowsSystemGetAvailablePorts(
 
     // Error if buffer size is to small
     if (result.length() + 1 > bufferSize) {
-        returnStatus(StatusCodes::BUFFER_ERROR);
+        return status(StatusCodes::BUFFER_ERROR);
     }
 
     memcpy(buffer, result.c_str(), result.length() + 1);

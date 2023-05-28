@@ -11,4 +11,4 @@ enum class StatusCodes {
     NOT_FOUND_ERROR = -9
 };
 
-#define returnStatus(status) return static_cast<int>(status)
+#define status(status) static_cast<int>(status)

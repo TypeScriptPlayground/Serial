@@ -6,9 +6,13 @@
 #include <windows.h>
 #include "status_codes.h"
 
+extern void (*callback)();
+
 extern HANDLE hSerialPort;
 extern DCB dcbSerialParams;
 extern COMMTIMEOUTS timeouts;
+
+void windowsSetCallbackFunction(void (*func)());
 
 auto windowsSystemOpen(
     void* port,

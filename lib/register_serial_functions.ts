@@ -6,6 +6,10 @@ export function registerSerialFunctions(
     libSuffix : string
 ) : SerialFunctions {
     const serialFunctions = Deno.dlopen(`${path}/${os}.${libSuffix}`, {
+        'serialSetCallBackFunction': {
+            parameters: ['function'],
+            result: 'void'
+        },
         'serialOpen': {
             parameters: [
                 // Port
@@ -84,6 +88,16 @@ export function registerSerialFunctions(
             result: 'i32'
         }
     }).symbols
+
+    const callback = new Deno.UnsafeCallback({
+        parameters: [],
+        result: "void",
+    } as const,
+    () => {
+        console.log('Callback from C++!');    
+    });
+
+    serialFunctions.serialSetCallBackFunction(callback.pointer);
     
     return {
         open: serialFunctions.serialOpen,
@@ -94,3 +108,4 @@ export function registerSerialFunctions(
         getAvailablePorts: serialFunctions.serialGetAvailablePorts
     }
 }
+
