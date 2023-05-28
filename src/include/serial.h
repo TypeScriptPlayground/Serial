@@ -19,7 +19,7 @@
 #   define systemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar) windowsSystemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar)
 #   define systemWrite(buffer, bufferSize, timeout, multiplier) windowsSystemWrite(buffer, bufferSize, timeout, multiplier)
 #   define systemGetAvailablePorts(buffer, bufferSize, separator) windowsSystemGetAvailablePorts(buffer, bufferSize, separator)
-#   define systemSetCallbackFunction(f_pointer) windowsSetCallbackFunction(f_pointer)
+#   define systemError(f_pointer) windowsSystemError(f_pointer)
 #endif
 
 // Linux, Apple
@@ -31,14 +31,14 @@
 #   define systemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar) unixSystemReadUntil(buffer, bufferSize, timeout, multiplier, untilChar)
 #   define systemWrite(buffer, bufferSize, timeout, multiplier) unixSystemWrite(buffer, bufferSize, timeout, multiplier)
 #   define systemGetAvailablePorts(buffer, bufferSize, separator) unixSystemGetAvailablePorts(buffer, bufferSize, separator)
-#   define systemSetCallbackFunction(f_pointer) unixSetCallbackFunction(f_pointer)
+#   define systemError(f_pointer) unixSystemError(f_pointer)
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    MODULE_API auto serialSetCallBackFunction(void (*func)(int code, void* buffer)) -> void;
+    MODULE_API auto serialError(void (*func)(int code, void* buffer)) -> void;
 
     MODULE_API void serialOpen(
         void* port,

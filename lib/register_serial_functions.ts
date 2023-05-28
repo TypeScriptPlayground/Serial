@@ -8,7 +8,7 @@ export function registerSerialFunctions(
     console.log(`Opening: ${path}/${os}.${libSuffix}`);
 
     const serialFunctions = Deno.dlopen(`${path}/${os}.${libSuffix}`, {
-        'serialSetCallBackFunction': {
+        'serialError': {
             parameters: ['function'],
             result: 'void'
         },

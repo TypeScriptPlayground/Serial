@@ -1,7 +1,7 @@
 #include "serial.h"
 
-void serialSetCallBackFunction(void (*func)(int code, void* buffer)) {
-    systemSetCallbackFunction(func);
+void serialError(void (*func)(int code, void* buffer)) {
+    systemError(func);
 }
 
 void serialOpen(

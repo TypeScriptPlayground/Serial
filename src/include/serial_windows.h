@@ -12,7 +12,7 @@ extern HANDLE hSerialPort;
 extern DCB dcbSerialParams;
 extern COMMTIMEOUTS timeouts;
 
-void windowsSetCallbackFunction(void (*func)(int code, void* buffer));
+void windowsSystemError(void (*func)(int code, void* buffer));
 
 void windowsSystemOpen(
     void* port,
