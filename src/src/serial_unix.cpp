@@ -15,7 +15,7 @@
 int hSerialPort;
 termios2 tty;
 
-std::ofstream log("log.log", std::ios::out);
+std::ofstream logging("log.log", std::ios::out);
 
 void (*errorCallback)(int errorCode);
 void (*readCallback)(int bytes);
@@ -32,16 +32,17 @@ void serialOpen(
     // Open new serial connection
     hSerialPort = open(portName, O_RDWR);
 
-    if(hSerialPort == -1){
-        log << strerror(errno);
-    }
-    else {
-        log << hSerialPort;
-    }
-
-    
     // Error if open fails
-    ioctl(hSerialPort, TCGETS2, &tty);
+    if(hSerialPort == -1){
+        errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        return;
+    }
+    
+    // Get the current com configuration
+    if(ioctl(hSerialPort, TCGETS2, &tty) == -1){
+        errorCallback(status(StatusCodes::GET_STATE_ERROR));
+        return;
+    }
 
     tty.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
     tty.c_cflag &= ~CSTOPB; // Clear stop field, only one stop bit used in communication (most common)
@@ -69,9 +70,9 @@ void serialOpen(
     tty.c_ispeed = baudrate;
     tty.c_ospeed = baudrate;
 
-
     // Data bits
     tty.c_cflag &=  ~CSIZE;			// CSIZE is a mask for the number of bits per character
+
     switch(dataBits) {
         case 5:
             tty.c_cflag |= CS5;
@@ -86,7 +87,6 @@ void serialOpen(
             tty.c_cflag |= CS8;
             break;
     }
-
 
     // parity
     switch(parity) {
@@ -116,13 +116,22 @@ void serialOpen(
     }
 
     // Save tty settings, also checking for error
-    ioctl(hSerialPort, TCSETS2, &tty);
+    if (ioctl(hSerialPort, TCSETS2, &tty) == -1){
+        errorCallback(status(StatusCodes::SET_STATE_ERROR));
+        return;
+    }
 
-    // returnStatus(StatusCodes::SUCCESS);
+    return;
 }
 
 void serialClose() {
-    close(hSerialPort);
+    // Error if close fails
+    if (close(hSerialPort) == -1) {
+        errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+        return;
+    }
+
+    return;
 }
 
 auto serialRead(
@@ -131,7 +140,14 @@ auto serialRead(
     const int timeout,
     const int multiplier
 ) -> int {
-    return read(hSerialPort, static_cast<char*>(buffer), bufferSize);
+    int bytesRead = read(hSerialPort, static_cast<char*>(buffer), bufferSize);
+    
+    if (bytesRead >= 0){
+        return bytesRead;
+    }
+
+    errorCallback(status(StatusCodes::READ_ERROR));
+    return 0;
 }
 
 auto serialReadUntil(
@@ -155,11 +171,9 @@ auto serialWrite(
 
     int bytesWritten = write(hSerialPort, tmp, bufferSize);
 
-    if (bytesWritten > 0){
+    if (bytesWritten >= 0){
         return bytesWritten;
     }
-
-    log << strerror(errno);
 
     errorCallback(status(StatusCodes::WRITE_ERROR));
     return 0;
