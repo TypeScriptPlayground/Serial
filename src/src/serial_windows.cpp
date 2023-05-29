@@ -15,17 +15,6 @@ void (*callback)(int errorCode);
 
 #define CALLBACK_STOP(errorCode) callback(status(errorCode)); return;
 
-bool isSerialPortClosed(HANDLE hSerialPort) {
-    DWORD modemStatus;
-    if (!GetCommModemStatus(hSerialPort, &modemStatus)) {
-        // Fehler beim Abrufen des Modemstatus
-        return true;
-    }
-    
-    // Überprüfen, ob die Verbindung geschlossen wurde
-    return (modemStatus == 0x00);
-}
-
 void serialOpen(
     void* port,
     const int baudrate,
@@ -193,11 +182,6 @@ auto serialWrite(
     const int timeout,
     const int multiplier
 ) -> int {
-
-    if (isSerialPortClosed(hSerialPort)){
-        callback(status(StatusCodes::INVALID_HANDLE_ERROR));
-        return 0;
-    }
 
     DWORD bytesWritten = 0;
 
