@@ -1,6 +1,6 @@
-#include <fstream>
 #if defined(__unix__) || defined(__unix) || defined(__APPLE__)
 #include "serial.h"
+#include <fstream>
 #include <unistd.h>     // UNIX standard function definitions
 #include <fcntl.h>      // File control definitions
 #include <sys/ioctl.h> // Used for TCGETS2, which is required for custom baud rates
@@ -32,7 +32,13 @@ void serialOpen(
     // Open new serial connection
     hSerialPort = open(portName, O_RDWR);
 
-    log << strerror(errno);
+    if(hSerialPort == -1){
+        log << strerror(errno);
+    }
+    else {
+        log << hSerialPort;
+    }
+
     
     // Error if open fails
     ioctl(hSerialPort, TCGETS2, &tty);
