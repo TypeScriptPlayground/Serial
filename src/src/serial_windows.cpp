@@ -1,5 +1,9 @@
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
-#include "serial_windows.h"
+#include "serial.h"
+#include <string>
+#include <fstream>
+#include <windows.h>
+#include "status_codes.h"
 
 
 HANDLE hSerialPort;
@@ -8,6 +12,8 @@ COMMTIMEOUTS timeouts = {0};
 std::string data;
 
 void (*callback)(int errorCode);
+
+#define CALLBACK_STOP(errorCode) callback(status(errorCode)); return;
 
 bool isSerialPortClosed(HANDLE hSerialPort) {
     DWORD modemStatus;
@@ -20,7 +26,7 @@ bool isSerialPortClosed(HANDLE hSerialPort) {
     return (modemStatus == 0x00);
 }
 
-void openWindows(
+void serialOpen(
     void* port,
     const int baudrate,
     const int dataBits,
@@ -89,7 +95,7 @@ void openWindows(
     }
 }
 
-void closeWindows() {
+void serialClose() {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         CALLBACK_STOP(StatusCodes::INVALID_HANDLE_ERROR);
@@ -101,7 +107,7 @@ void closeWindows() {
     }
 }
 
-auto readWindows(
+auto serialRead(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -134,7 +140,7 @@ auto readWindows(
     return bytesRead;
 }
 
-auto readUntilWindows(
+auto serialReadUntil(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -181,7 +187,7 @@ auto readUntilWindows(
     return data.length();
 }
 
-auto writeWindows(
+auto serialWrite(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -213,7 +219,7 @@ auto writeWindows(
     return bytesWritten;
 }
 
-auto getPortsInfoWindows(
+auto serialGetPortsInfo(
     void* buffer,
     const int bufferSize,
     void* separator
@@ -253,7 +259,7 @@ auto getPortsInfoWindows(
     return portsCounter;
 }
 
-void onErrorWindows(void (*func)(int errorCode)){
+void serialOnError(void (*func)(int errorCode)){
     callback = func;
 }
 
