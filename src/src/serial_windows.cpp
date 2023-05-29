@@ -9,9 +9,9 @@ DCB dcbSerialParams = {0};
 COMMTIMEOUTS timeouts = {0};
 std::string data;
 
-void (*callback)(int errorCode);
-
-#define CALLBACK_STOP(errorCode) callback(status(errorCode)); return;
+void (*errorCallback)(int errorCode);
+void (*readCallback)(int bytes);
+void (*writeCallback)(int bytes);
 
 void serialOpen(
     void* port,
@@ -37,17 +37,20 @@ void serialOpen(
 
     // Error if open fails
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        CALLBACK_STOP(StatusCodes::INVALID_HANDLE_ERROR);
+        errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        return;
     }
 
     // Error if configuration get fails
     if (!GetCommState(hSerialPort, &dcbSerialParams)) {
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
-            CALLBACK_STOP(StatusCodes::CLOSE_HANDLE_ERROR);
+            errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+            return;
         }
 
-        CALLBACK_STOP(StatusCodes::GET_STATE_ERROR);
+        errorCallback(status(StatusCodes::GET_STATE_ERROR));
+        return;
     }
 
     dcbSerialParams.BaudRate = baudrate;
@@ -59,10 +62,12 @@ void serialOpen(
     if (!SetCommState(hSerialPort, &dcbSerialParams)) {
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
-            CALLBACK_STOP(StatusCodes::CLOSE_HANDLE_ERROR);
+            errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+            return;
         }
         
-        CALLBACK_STOP(StatusCodes::SET_STATE_ERROR);
+        errorCallback(status(StatusCodes::SET_STATE_ERROR));
+        return;
     }
     
     timeouts.ReadIntervalTimeout = 50;
@@ -75,22 +80,26 @@ void serialOpen(
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
-            CALLBACK_STOP(StatusCodes::CLOSE_HANDLE_ERROR);
+            errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+            return;
         }
-        
-        CALLBACK_STOP(StatusCodes::SET_TIMEOUT_ERROR);
+
+        errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        return;
     }
 }
 
 void serialClose() {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        CALLBACK_STOP(StatusCodes::INVALID_HANDLE_ERROR);
+        errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        return;
     }
 
     // Error if close fails
     if (!CloseHandle(hSerialPort)) {
-        CALLBACK_STOP(StatusCodes::CLOSE_HANDLE_ERROR);
+        errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+        return;
     }
 }
 
@@ -102,7 +111,7 @@ auto serialRead(
 ) -> int {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        callback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
         return 0;
     }
 
@@ -112,7 +121,7 @@ auto serialRead(
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        callback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
         return 0;
     }
 
@@ -120,10 +129,11 @@ auto serialRead(
 
     // Error if read fails
     if (!ReadFile(hSerialPort, buffer, bufferSize, &bytesRead, NULL)) {
-        callback(status(StatusCodes::READ_ERROR));
+        errorCallback(status(StatusCodes::READ_ERROR));
         return 0;
     }
     
+    readCallback(bytesRead);
     return bytesRead;
 }
 
@@ -136,7 +146,7 @@ auto serialReadUntil(
 ) -> int {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        callback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
         return 0;
     }
 
@@ -146,7 +156,7 @@ auto serialReadUntil(
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        callback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
         return 0;
     }
 
@@ -158,7 +168,7 @@ auto serialReadUntil(
 
         // Error if read fails
         if (!ReadFile(hSerialPort, bufferChar, sizeof(bufferChar), &bytesRead, NULL)) {
-            callback(status(StatusCodes::READ_ERROR));
+            errorCallback(status(StatusCodes::READ_ERROR));
             return 0;
         }
 
@@ -171,6 +181,7 @@ auto serialReadUntil(
 
     memcpy(buffer, data.c_str(), data.length() + 1);
 
+    readCallback(data.length());
     return data.length();
 }
 
@@ -188,16 +199,17 @@ auto serialWrite(
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        callback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
         return 0;
     }
 
     // Error if write fails
     if (!WriteFile(hSerialPort, buffer, bufferSize, &bytesWritten, NULL)) {
-        callback(status(StatusCodes::WRITE_ERROR));
+        errorCallback(status(StatusCodes::WRITE_ERROR));
         return 0;
     }
     
+    writeCallback(bytesWritten);
     return bytesWritten;
 }
 
@@ -232,7 +244,7 @@ auto serialGetPortsInfo(
 
     // Error if buffer size is to small
     if (result.length() + 1 > bufferSize) {
-        callback(status(StatusCodes::BUFFER_ERROR));
+        errorCallback(status(StatusCodes::BUFFER_ERROR));
         return 0;
     }
 
@@ -242,7 +254,15 @@ auto serialGetPortsInfo(
 }
 
 void serialOnError(void (*func)(int errorCode)){
-    callback = func;
+    errorCallback = func;
+}
+
+void serialOnRead(void (*func)(int bytes)){
+    readCallback = func;
+}
+
+void serialOnWrite(void (*func)(int bytes)){
+    writeCallback = func;
 }
 
 #endif
