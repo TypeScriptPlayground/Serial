@@ -14,6 +14,10 @@
 #   define MODULE_API
 #endif
 
+extern void (*errorCallback)(int errorCode);
+extern void (*readCallback)(int bytes);
+extern void (*writeCallback)(int bytes);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -56,11 +60,17 @@ extern "C" {
         void* separator
     ) -> int;
     
-    MODULE_API auto serialOnError(void (*func)(int code)) -> void;
+    MODULE_API auto inline serialOnError(void (*func)(int code)) -> void {
+        errorCallback = func;
+    };
 
-    MODULE_API auto serialOnRead(void (*func)(int bytes)) -> void;
+    MODULE_API auto inline serialOnRead(void (*func)(int bytes)) -> void {
+        readCallback = func;
+    };
     
-    MODULE_API auto serialOnWrite(void (*func)(int bytes)) -> void;
+    MODULE_API auto inline serialOnWrite(void (*func)(int bytes)) -> void {
+        writeCallback = func;
+    };
 
 #ifdef __cplusplus
 }
