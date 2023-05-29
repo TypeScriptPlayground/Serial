@@ -1,9 +1,7 @@
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
-#include "serial.h"
-#include <string>
-#include <fstream>
 #include <windows.h>
-#include "status_codes.h"
+
+#include "serial.h"
 
 
 HANDLE hSerialPort;

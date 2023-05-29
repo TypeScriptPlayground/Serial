@@ -1,4 +1,8 @@
 #pragma once
+#include <string>
+
+#include "status_codes.h"
+
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #   ifdef SERIALPORT_EXPORTS

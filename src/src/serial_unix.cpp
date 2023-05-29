@@ -1,14 +1,10 @@
 #if defined(__unix__) || defined(__unix) || defined(__APPLE__)
 #include "serial.h"
-#include <string.h>     // String function definitions
 #include <unistd.h>     // UNIX standard function definitions
 #include <fcntl.h>      // File control definitions
 #include <sys/ioctl.h> // Used for TCGETS2, which is required for custom baud rates
 #include <asm/termbits.h>
-#include <string>
 // #include <filesystem>
-
-#include "status_codes.h"
 
 
 // namespace fs = std::filesystem;
