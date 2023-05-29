@@ -11,7 +11,7 @@ export function registerSerialFunctions(
     
     console.log(parentDirectoryUrl);
     
-    const serialFunctions = Deno.dlopen(`parentDirectoryUrl${path}/${os}.${libSuffix}`.replace(/^\//gm, ''), {
+    const serialFunctions = Deno.dlopen(`${parentDirectoryUrl}/${path}/${os}.${libSuffix}`.replace(/^\//gm, ''), {
         'serialOpen': {
             parameters: [
                 // Port
