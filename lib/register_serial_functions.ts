@@ -101,6 +101,12 @@ export function registerSerialFunctions(
     }).symbols
 
     return {
+        open: serialFunctions.serialOpen,
+        close:  serialFunctions.serialClose,
+        read: serialFunctions.serialRead,
+        readUntil: serialFunctions.serialReadUntil,
+        write: serialFunctions.serialWrite,
+        getPortsInfo: serialFunctions.serialGetPortsInfo,
         onError: (callback) => {
             serialFunctions.serialOnError(new Deno.UnsafeCallback({
                 parameters: ['u32'],
@@ -121,13 +127,7 @@ export function registerSerialFunctions(
                 result: "void",
             } as const,
             (bytes) => {callback(bytes)}).pointer)
-        },
-        open: serialFunctions.serialOpen,
-        close:  serialFunctions.serialClose,
-        read: serialFunctions.serialRead,
-        readUntil: serialFunctions.serialReadUntil,
-        write: serialFunctions.serialWrite,
-        getPortsInfo: serialFunctions.serialGetPortsInfo
+        }
     }
 }
 
