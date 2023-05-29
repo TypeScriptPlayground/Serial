@@ -2,6 +2,10 @@
 name: "Pre-Release"
 
 on:
+  push:
+    paths:
+      - '.github/workflows/release.yml'
+
   pull_request:
     branches: [ "main" ]
     paths:
@@ -29,7 +33,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: linux-binary
-        path: ${{github.workspace}}/build/libserialport.so
+        path: ${{github.workspace}}/build/src/libserialport.so
         
   build_windows:
     runs-on: windows-latest
@@ -47,7 +51,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: windows-binary
-        path: ${{github.workspace}}\build\Release\serialport.dll
+        path: ${{github.workspace}}\build\src\Release\serialport.dll
 
   pre-release:
     needs: [build_windows, build_linux]
