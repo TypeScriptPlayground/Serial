@@ -10,7 +10,7 @@ import { SerialFunctions } from "./interfaces/serial_functions.d.ts";
 import { SerialOptions } from "./interfaces/serial_options.d.ts";
 import { loadBinaryForOS } from "./load_binary_for_os.ts";
 
-const pathToBinariesDirectory = './lib/bin';
+const pathToBinariesDirectory = './ts/bin';
 
 export class Serial {
     private _isOpen : boolean;
