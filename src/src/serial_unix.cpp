@@ -16,13 +16,6 @@ void (*errorCallback)(int errorCode);
 void (*readCallback)(int bytes);
 void (*writeCallback)(int bytes);
 
-namespace helper {
-    void Callback(StatusCodes errorCode){        
-        static std::string msg = "";
-        callback(status(errorCode));
-    }
-}
-
 void serialOpen(
     void* port,
     const int baudrate,
