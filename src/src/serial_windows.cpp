@@ -252,4 +252,17 @@ auto serialGetPortsInfo(
     
     return portsCounter;
 }
+
+auto serialOnError(void (*func)(int code)) -> void {
+    errorCallback = func;
+};
+
+auto serialOnRead(void (*func)(int bytes)) -> void {
+    readCallback = func;
+};
+
+auto serialOnWrite(void (*func)(int bytes)) -> void {
+    writeCallback = func;
+};
+
 #endif
