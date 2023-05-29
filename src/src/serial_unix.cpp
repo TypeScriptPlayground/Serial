@@ -1,3 +1,4 @@
+#include <fstream>
 #if defined(__unix__) || defined(__unix) || defined(__APPLE__)
 #include "serial.h"
 #include <unistd.h>     // UNIX standard function definitions
@@ -143,7 +144,16 @@ auto serialWrite(
 
     std::string tmp(static_cast<char*>(buffer), bufferSize);
 
-    return write(hSerialPort, tmp.c_str(), tmp.length() + 1);
+    int bytesWritten = write(hSerialPort, tmp.c_str(), tmp.length() + 1);
+
+    if (bytesWritten > 0){
+        return bytesWritten;
+    }
+
+    std::ofstream("log.log", std::ios::out) << bytesWritten;
+
+    errorCallback(status(StatusCodes::WRITE_ERROR));
+    return 0;
 }
 
 auto serialOnError(void (*func)(int code)) -> void {
