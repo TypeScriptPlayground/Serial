@@ -5,6 +5,9 @@ export function registerSerialFunctions(
     os : string,
     libSuffix : string
 ) : SerialFunctions {
+    
+    console.log(`${path}/${os}.${libSuffix}`);
+    
     const serialFunctions = Deno.dlopen(`${path}/${os}.${libSuffix}`, {
         'serialOpen': {
             parameters: [
