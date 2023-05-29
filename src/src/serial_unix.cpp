@@ -158,6 +158,10 @@ auto serialOnWrite(void (*func)(int bytes)) -> void {
     writeCallback = func;
 };
 
+auto serialGetPortsInfo(void *buffer, const int bufferSize, void *separator) -> int {
+    return 0;
+}
+
 // auto getPortsInfoUnix(
 //     void* buffer,
 //     const int bufferSize,
