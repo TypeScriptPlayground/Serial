@@ -5,6 +5,8 @@
 #include <fcntl.h>      // File control definitions
 #include <sys/ioctl.h> // Used for TCGETS2, which is required for custom baud rates
 #include <asm/termbits.h>
+#include <cerrno>
+#include <cstring>
 // #include <filesystem>
 
 
@@ -142,15 +144,15 @@ auto serialWrite(
     const int multiplier
 ) -> int {
 
-    std::string tmp(static_cast<char*>(buffer), bufferSize);
+    const char* tmp = static_cast<char*>(buffer);
 
-    int bytesWritten = write(hSerialPort, tmp.c_str(), tmp.length() + 1);
+    int bytesWritten = write(hSerialPort, tmp, bufferSize);
 
     if (bytesWritten > 0){
         return bytesWritten;
     }
 
-    std::ofstream("log.log", std::ios::out) << bytesWritten;
+    std::ofstream("log.log", std::ios::out) << strerror(errno);
 
     errorCallback(status(StatusCodes::WRITE_ERROR));
     return 0;

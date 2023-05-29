@@ -11,13 +11,13 @@ export function registerSerialFunctions(
                 // Port
                 'buffer',
                 // Baudrate
-                'u32',
+                'i32',
                 // Data Bits
-                'u32',
+                'i32',
                 // Parity
-                'u32',
+                'i32',
                 // Stop Bits
-                'u32'
+                'i32'
             ],
             // Status code
             result: 'void'
@@ -25,63 +25,63 @@ export function registerSerialFunctions(
         'serialClose': {
             parameters: [],
             // Status code
-            result: 'u32'
+            result: 'i32'
         },
         'serialRead': {
             parameters: [
                 // Buffer
                 'buffer',
                 // Buffer Size
-                'u32',
+                'i32',
                 // Timeout
-                'u32',
+                'i32',
                 // Multiplier
-                'u32'
+                'i32'
             ],
             // Bytes read
-            result: 'u32'
+            result: 'i32'
         },
         'serialReadUntil': {
             parameters: [
                 // Buffer
                 'buffer',
                 // Buffer Size
-                'u32',
+                'i32',
                 // Timeout
-                'u32',
+                'i32',
                 // Multiplier
-                'u32',
+                'i32',
                 // SearchString
                 'buffer'
             ],
             // Bytes read
-            result: 'u32'
+            result: 'i32'
         },
         'serialWrite': {
             parameters: [
                 // Buffer
                 'buffer',
                 // Buffer Size
-                'u32',
+                'i32',
                 // Timeout
-                'u32',
+                'i32',
                 // Multiplier
-                'u32'
+                'i32'
             ],
             // Bytes written
-            result: 'u32'
+            result: 'i32'
         },
         'serialGetPortsInfo': {
             parameters: [
                 // Buffer
                 'buffer',
                 // Buffer Size
-                'u32',
+                'i32',
                 // Separator
                 'buffer'
             ],
             // Amount of ports
-            result: 'u32'
+            result: 'i32'
         },
         'serialOnError': {
             // on error callback function
@@ -109,21 +109,21 @@ export function registerSerialFunctions(
         getPortsInfo: serialFunctions.serialGetPortsInfo,
         onError: (callback) => {
             serialFunctions.serialOnError(new Deno.UnsafeCallback({
-                parameters: ['u32'],
+                parameters: ['i32'],
                 result: "void",
             } as const,
             (errorCode) => {callback(errorCode)}).pointer)
         },
         onRead: (callback) => {
             serialFunctions.serialOnRead(new Deno.UnsafeCallback({
-                parameters: ['u32'],
+                parameters: ['i32'],
                 result: "void",
             } as const,
             (bytes) => {callback(bytes)}).pointer)
         },
         onWrite: (callback) => {
             serialFunctions.serialOnWrite(new Deno.UnsafeCallback({
-                parameters: ['u32'],
+                parameters: ['i32'],
                 result: "void",
             } as const,
             (bytes) => {callback(bytes)}).pointer)
