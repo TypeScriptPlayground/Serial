@@ -26,7 +26,7 @@ This library provides an interface for the communication with serial devices and
 - Create multiple serial connections at the same time.
 - List available ports and their properties.
 - Set timeouts for both reading and writing.
-- All functions are async.
+- All functions are async (currently not implemented yet).
 - Uses no third party modules.
 - Works on different operating systems (check [compatibility](#compatibility) for mor info).
 
@@ -35,12 +35,6 @@ This library provides an interface for the communication with serial devices and
 |---------|-------------------------|---------------|
 | Windows | Windows 10 (x64)        | implemented   |
 | Linux   | Ubuntu Server 22.04 LTS | implemented   |
-
-## Possible/Known issues
-- What happens if you open multiple connections from the same instance.
-- Every function returns the status code although it is previously checked.
-- What happens if you async read 2 times directly after each other.
-- Linux write currently not working
 
 ## Examples - How to use
 To use this library you need the following flags to run it:
