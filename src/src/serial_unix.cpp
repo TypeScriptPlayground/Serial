@@ -146,6 +146,18 @@ auto serialWrite(
     return write(hSerialPort, tmp.c_str(), tmp.length() + 1);
 }
 
+auto serialOnError(void (*func)(int code)) -> void {
+    errorCallback = func;
+};
+
+auto serialOnRead(void (*func)(int bytes)) -> void {
+    readCallback = func;
+};
+
+auto serialOnWrite(void (*func)(int bytes)) -> void {
+    writeCallback = func;
+};
+
 // auto getPortsInfoUnix(
 //     void* buffer,
 //     const int bufferSize,
