@@ -1,3 +1,4 @@
+#include <algorithm>
 #if defined(__unix__) || defined(__unix) || defined(__APPLE__)
 #include "serial.h"
 #include <fstream>
@@ -140,6 +141,25 @@ auto serialRead(
     const int timeout,
     const int multiplier
 ) -> int {
+
+    if (ioctl(hSerialPort, TCGETS2, &tty) == -1){
+        errorCallback(status(StatusCodes::SET_STATE_ERROR));
+        return 0;
+    }
+
+    if (timeout > 0 && timeout < 100) {
+        tty.c_cc[VTIME] = 1;
+    } else {
+        tty.c_cc[VTIME] = timeout / 100;
+    }
+
+    tty.c_cc[VMIN] = bufferSize;
+
+    if (ioctl(hSerialPort, TCSETS2, &tty) == -1){
+        errorCallback(status(StatusCodes::SET_STATE_ERROR));
+        return 0;
+    }
+
     int bytesRead = read(hSerialPort, static_cast<char*>(buffer), bufferSize);
     
     if (bytesRead >= 0){
