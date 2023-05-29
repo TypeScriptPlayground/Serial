@@ -1,5 +1,11 @@
 #if defined(__unix__) || defined(__unix) || defined(__APPLE__)
-#include "serial_unix.h"
+#include "serial.h"
+#include <unistd.h>     // UNIX standard function definitions
+#include <fcntl.h>      // File control definitions
+#include <sys/ioctl.h> // Used for TCGETS2, which is required for custom baud rates
+#include <asm/termbits.h>
+// #include <filesystem>
+
 
 // namespace fs = std::filesystem;
 
@@ -15,11 +21,11 @@ namespace helper {
     }
 }
 
-void onErrorUnix(void (*func)(int code)){
+void serialOnError(void (*func)(int code)){
     callback = func;
 }
 
-void openUnix(
+void serialOpen(
     void* port,
     const int baudrate,
     const int dataBits,
@@ -114,11 +120,11 @@ void openUnix(
     // returnStatus(StatusCodes::SUCCESS);
 }
 
-void closeUnix() {
+void serialClose() {
     close(hSerialPort);
 }
 
-auto readUnix(
+auto serialRead(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -127,7 +133,7 @@ auto readUnix(
     return read(hSerialPort, static_cast<char*>(buffer), bufferSize);
 }
 
-auto readUntilUnix(
+auto serialReadUntil(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -137,7 +143,7 @@ auto readUntilUnix(
     return 0;
 }
 
-auto writeUnix(
+auto serialWrite(
     void* buffer,
     const int bufferSize,
     const int timeout,

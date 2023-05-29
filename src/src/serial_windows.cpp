@@ -1,5 +1,7 @@
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
-#include "serial_windows.h"
+#include <windows.h>
+
+#include "serial.h"
 
 
 HANDLE hSerialPort;
@@ -9,18 +11,9 @@ std::string data;
 
 void (*callback)(int errorCode);
 
-bool isSerialPortClosed(HANDLE hSerialPort) {
-    DWORD modemStatus;
-    if (!GetCommModemStatus(hSerialPort, &modemStatus)) {
-        // Fehler beim Abrufen des Modemstatus
-        return true;
-    }
-    
-    // Überprüfen, ob die Verbindung geschlossen wurde
-    return (modemStatus == 0x00);
-}
+#define CALLBACK_STOP(errorCode) callback(status(errorCode)); return;
 
-void openWindows(
+void serialOpen(
     void* port,
     const int baudrate,
     const int dataBits,
@@ -89,7 +82,7 @@ void openWindows(
     }
 }
 
-void closeWindows() {
+void serialClose() {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         CALLBACK_STOP(StatusCodes::INVALID_HANDLE_ERROR);
@@ -101,7 +94,7 @@ void closeWindows() {
     }
 }
 
-auto readWindows(
+auto serialRead(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -134,7 +127,7 @@ auto readWindows(
     return bytesRead;
 }
 
-auto readUntilWindows(
+auto serialReadUntil(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -181,17 +174,12 @@ auto readUntilWindows(
     return data.length();
 }
 
-auto writeWindows(
+auto serialWrite(
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier
 ) -> int {
-
-    if (isSerialPortClosed(hSerialPort)){
-        callback(status(StatusCodes::INVALID_HANDLE_ERROR));
-        return 0;
-    }
 
     DWORD bytesWritten = 0;
 
@@ -213,7 +201,7 @@ auto writeWindows(
     return bytesWritten;
 }
 
-auto getPortsInfoWindows(
+auto serialGetPortsInfo(
     void* buffer,
     const int bufferSize,
     void* separator
@@ -253,7 +241,7 @@ auto getPortsInfoWindows(
     return portsCounter;
 }
 
-void onErrorWindows(void (*func)(int errorCode)){
+void serialOnError(void (*func)(int errorCode)){
     callback = func;
 }
 
