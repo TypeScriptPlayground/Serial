@@ -60,17 +60,11 @@ extern "C" {
         void* separator
     ) -> int;
     
-    MODULE_API auto inline serialOnError(void (*func)(int code)) -> void {
-        errorCallback = func;
-    };
+    MODULE_API auto serialOnError(void (*func)(int code)) -> void;
 
-    MODULE_API auto inline serialOnRead(void (*func)(int bytes)) -> void {
-        readCallback = func;
-    };
+    MODULE_API auto serialOnRead(void (*func)(int bytes)) -> void;
     
-    MODULE_API auto inline serialOnWrite(void (*func)(int bytes)) -> void {
-        writeCallback = func;
-    };
+    MODULE_API auto serialOnWrite(void (*func)(int bytes)) -> void;
 
 #ifdef __cplusplus
 }
