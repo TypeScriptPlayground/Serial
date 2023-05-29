@@ -25,6 +25,14 @@ export class Serial {
         this._dl.onError((code) => {
             throw new Error(`An error has occurred. Error code: ${code}`);
         });
+
+        this._dl.onRead((bytes) => {
+            console.log('onRead():', bytes);
+            
+        })
+        this._dl.onWrite((bytes) => {
+            console.log('onWrite():', bytes);
+        })
     }
 
     /**
