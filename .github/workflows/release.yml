@@ -10,7 +10,7 @@ on:
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'src/**'
+      - 'cpp/**'
       - '.github/workflows/release.yml'
 
 env:
@@ -34,7 +34,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: linux-binary
-        path: ${{github.workspace}}/build/src/libserialport.so
+        path: ${{github.workspace}}/build/cpp/libserialport.so
         
   build_windows:
     runs-on: windows-latest
@@ -52,7 +52,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: windows-binary
-        path: ${{github.workspace}}\build\src\Release\serialport.dll
+        path: ${{github.workspace}}\build\cpp\Release\serialport.dll
 
   pre-release:
     needs: [build_windows, build_linux]
@@ -68,18 +68,18 @@ jobs:
           path: ${{github.workspace}}/tmp
           
       - name: Rename linux Binary
-        run: mv ${{github.workspace}}/tmp/linux-binary/libserialport.so ${{github.workspace}}/lib/bin/linux.so
+        run: mv ${{github.workspace}}/tmp/linux-binary/libserialport.so ${{github.workspace}}/ts/bin/linux.so
         
       - name: Rename windows Binary
-        run: mv ${{github.workspace}}/tmp/windows-binary/serialport.dll ${{github.workspace}}/lib/bin/windows.dll
+        run: mv ${{github.workspace}}/tmp/windows-binary/serialport.dll ${{github.workspace}}/ts/bin/windows.dll
         
       - run: cd ${{github.workspace}}
         
       - name: make .tar.gz file
-        run: tar -czvf SerialLink-lib.tar.gz ./lib
+        run: tar -czvf SerialLink-lib.tar.gz ./ts
         
       - name: make .zip
-        run: zip -r SerialLink-lib.zip ./lib
+        run: zip -r SerialLink-lib.zip ./ts
     
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:

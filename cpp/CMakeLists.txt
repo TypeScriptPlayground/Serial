@@ -25,7 +25,7 @@ MACRO(header_directories return_list includes_base_folder extention )
 ENDMACRO()
 
 # using said macro.
-header_directories(INCLUDES ${PROJECT_SOURCE_DIR}/src/include/ h)
+header_directories(INCLUDES ${PROJECT_SOURCE_DIR}/cpp/include/ h)
 
 message("src files:")
 foreach(file ${SRCS})

@@ -1,10 +1,8 @@
 <!-- Badges -->
 [Build binaries]: https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build.yml?label=Build%20binaries&labelColor=343b42&logo=github&logoColor=959DA5 'Build binaries'
-[Release Downloads]: https://img.shields.io/github/downloads/TypeScriptPlayground/Serial/total?label=Downloads%20&labelColor=343b42&logo=docusign&logoColor=959DA5 'Total Release Downloads'
 
 # Serial
 [![Build binaries]](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build.yml)
-[![Release Downloads]](https://github.com/TypeScriptPlayground/Serial/releases)
 
 <a href="https://deno.land"><img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain"></a>
 
@@ -26,7 +24,7 @@ This library provides an interface for the communication with serial devices and
 - Create multiple serial connections at the same time.
 - List available ports and their properties.
 - Set timeouts for both reading and writing.
-- All functions are async.
+- All functions are async (currently not implemented yet).
 - Uses no third party modules.
 - Works on different operating systems (check [compatibility](#compatibility) for mor info).
 
@@ -35,12 +33,6 @@ This library provides an interface for the communication with serial devices and
 |---------|-------------------------|---------------|
 | Windows | Windows 10 (x64)        | implemented   |
 | Linux   | Ubuntu Server 22.04 LTS | implemented   |
-
-## Possible/Known issues
-- What happens if you open multiple connections from the same instance.
-- Every function returns the status code although it is previously checked.
-- What happens if you async read 2 times directly after each other.
-- Linux write currently not working
 
 ## Examples - How to use
 To use this library you need the following flags to run it:
