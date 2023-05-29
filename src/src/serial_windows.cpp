@@ -1,5 +1,7 @@
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
-#include "serial_windows.h"
+#include <windows.h>
+
+#include "serial.h"
 
 
 HANDLE hSerialPort;
@@ -7,23 +9,17 @@ DCB dcbSerialParams = {0};
 COMMTIMEOUTS timeouts = {0};
 std::string data;
 
-/**
-* @fn auto open(void* port, const int baudrate, const int dataBits, const int parity, const int stopBits) -> int
-* @brief Opens the specified connection to a serial device.
-* @param port The port to open the serial connection to
-* @param baudrate The baudrate for the serial connection when reading/writing
-* @param dataBits The data bits
-* @param parity The parity bits
-* @param stopBits The stop bits
-* @return Returns the current status code
-*/
-auto windowsSystemOpen(
+void (*errorCallback)(int errorCode);
+void (*readCallback)(int bytes);
+void (*writeCallback)(int bytes);
+
+void serialOpen(
     void* port,
     const int baudrate,
     const int dataBits,
     const int parity,
     const int stopBits
-) -> int {
+) {
 
     char *portName = static_cast<char*>(port);
 
@@ -41,13 +37,21 @@ auto windowsSystemOpen(
 
     // Error if open fails
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
+        errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        return;
     }
 
     // Error if configuration get fails
     if (!GetCommState(hSerialPort, &dcbSerialParams)) {
-        CloseHandle(hSerialPort);
-        returnStatus(StatusCodes::GET_STATE_ERROR);
+        // Error if close fails
+        if (!CloseHandle(hSerialPort)) {
+            errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+            return;
+        }
+
+        errorCallback(status(StatusCodes::GET_STATE_ERROR));
+
+        return;
     }
 
     dcbSerialParams.BaudRate = baudrate;
@@ -57,8 +61,14 @@ auto windowsSystemOpen(
 
     // Error if configuration set fails
     if (!SetCommState(hSerialPort, &dcbSerialParams)) {
-        CloseHandle(hSerialPort);
-        returnStatus(StatusCodes::SET_STATE_ERROR);
+        // Error if close fails
+        if (!CloseHandle(hSerialPort)) {
+            errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+            return;
+        }
+        
+        errorCallback(status(StatusCodes::SET_STATE_ERROR));
+        return;
     }
     
     timeouts.ReadIntervalTimeout = 50;
@@ -69,43 +79,32 @@ auto windowsSystemOpen(
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        CloseHandle(hSerialPort);
-        returnStatus(StatusCodes::SET_TIMEOUT_ERROR);
-    }
+        // Error if close fails
+        if (!CloseHandle(hSerialPort)) {
+            errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+            return;
+        }
 
-    returnStatus(StatusCodes::SUCCESS);
+        errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        return;
+    }
 }
 
-/**
-* @fn auto close() -> int
-* @brief Closes the specified connection to a serial device.
-* @return Returns the current status code
-*/
-auto windowsSystemClose() -> int {
+void serialClose() {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
+        errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        return;
     }
 
     // Error if close fails
     if (!CloseHandle(hSerialPort)) {
-        returnStatus(StatusCodes::CLOSE_HANDLE_ERROR);
+        errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
+        return;
     }
-
-    returnStatus(StatusCodes::SUCCESS);
 }
 
-/**
-* @fn auto read(void* buffer, const int bufferSize, const int timeout, const int multiplier) -> int
-* @brief Reads the specified number of bytes into the buffer.
-* **It is not guaranteed that the complete buffer will be fully read.**
-* @param buffer The buffer in which the bytes should be read into
-* @param bufferSize The size of the buffer
-* @param timeout Timeout to cancel the read
-* @param multiplier The time multiplier between reading
-* @return Returns the current status code (negative) or number of bytes read
-*/
-auto windowsSystemRead(
+auto serialRead(
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -113,7 +112,8 @@ auto windowsSystemRead(
 ) -> int {
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
+        errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        return 0;
     }
 
     timeouts.ReadIntervalTimeout = timeout;
@@ -122,40 +122,33 @@ auto windowsSystemRead(
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        returnStatus(StatusCodes::SET_TIMEOUT_ERROR);
+        errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        return 0;
     }
 
-    DWORD bytesRead;
+    DWORD bytesRead = 0;
 
     // Error if read fails
     if (!ReadFile(hSerialPort, buffer, bufferSize, &bytesRead, NULL)) {
-        returnStatus(StatusCodes::READ_ERROR);
+        errorCallback(status(StatusCodes::READ_ERROR));
+        return 0;
     }
     
+    readCallback(bytesRead);
     return bytesRead;
 }
 
-/**
-* @fn auto readUntil(void* buffer, const int bufferSize, const int timeout, const int mutilplier, void* searchString) -> int
-* @brief Reads until the specified string is found. If the specified string is not found, the buffer is read full until there are no more bytes to read.
-* **It is not guaranteed that the complete buffer will be fully read.**
-* @param buffer The buffer in which the bytes should be read into
-* @param bufferSize The size of the buffer
-* @param timeout Timeout to cancel the read
-* @param multiplier The time multiplier between reading
-* @param searchString The string to search for
-* @return Returns the current status code (negative) or number of bytes read
-*/
-auto windowsSystemReadUntil(
+auto serialReadUntil(
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier,
     void* searchString
 ) -> int {
-
+    // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
+        errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
+        return 0;
     }
 
     timeouts.ReadIntervalTimeout = timeout;
@@ -164,7 +157,8 @@ auto windowsSystemReadUntil(
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        returnStatus(StatusCodes::SET_TIMEOUT_ERROR);
+        errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        return 0;
     }
 
     data = "";
@@ -175,7 +169,8 @@ auto windowsSystemReadUntil(
 
         // Error if read fails
         if (!ReadFile(hSerialPort, bufferChar, sizeof(bufferChar), &bytesRead, NULL)) {
-            returnStatus(StatusCodes::READ_ERROR);
+            errorCallback(status(StatusCodes::READ_ERROR));
+            return 0;
         }
 
         if (bytesRead == 0) {
@@ -187,47 +182,39 @@ auto windowsSystemReadUntil(
 
     memcpy(buffer, data.c_str(), data.length() + 1);
 
+    readCallback(data.length());
     return data.length();
 }
 
-/**
-* @fn auto write(void* buffer, const int bufferSize, const int timeout, const int multiplier) -> int
-* @brief Writes the buffer to the serial device.
-* **It is not guaranteed that the complete buffer will be fully written.**
-* @param buffer The buffer in which the bytes should be read into
-* @param bufferSize The size of the buffer
-* @param timeout Timeout to cancel the read
-* @param multiplieer The time multiplier between writing
-* @return Returns the current status code (negative) or number of bytes written
-*/
-auto windowsSystemWrite(void* buffer, const int bufferSize, const int timeout, const int multiplier) -> int {
-    DWORD bytesWritten;
+auto serialWrite(
+    void* buffer,
+    const int bufferSize,
+    const int timeout,
+    const int multiplier
+) -> int {
+
+    DWORD bytesWritten = 0;
 
     timeouts.WriteTotalTimeoutConstant = timeout;
     timeouts.WriteTotalTimeoutMultiplier = multiplier;
 
     // Error if timeout set fails
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        returnStatus(StatusCodes::SET_TIMEOUT_ERROR);
+        errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
+        return 0;
     }
 
     // Error if write fails
     if (!WriteFile(hSerialPort, buffer, bufferSize, &bytesWritten, NULL)) {
-        returnStatus(StatusCodes::WRITE_ERROR);
+        errorCallback(status(StatusCodes::WRITE_ERROR));
+        return 0;
     }
     
+    writeCallback(bytesWritten);
     return bytesWritten;
 }
 
-/**
-* @fn auto getAvailablePorts(void* buffer, const int bufferSize, void* separator) -> int
-* @brief Get all the available serial ports.
-* @param buffer The buffer in which the bytes should be read into
-* @param bufferSize The size of the buffer
-* @param separator The separator for the array buffer
-* @return Returns the current status code (negative) or number of ports found
-*/
-auto windowsSystemGetAvailablePorts(
+auto serialGetPortsInfo(
     void* buffer,
     const int bufferSize,
     void* separator
@@ -242,7 +229,7 @@ auto windowsSystemGetAvailablePorts(
         // Error if open fails
         if (hPort == INVALID_HANDLE_VALUE) {
             CloseHandle(hPort);
-            returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
+            continue;
         }
 
         portsCounter++;
@@ -250,14 +237,33 @@ auto windowsSystemGetAvailablePorts(
 
         CloseHandle(hPort);
     }
+
+    // Remove last trailing comma
+    if (result.length() > 0) {
+        result.erase(result.length() - 1);
+    }
+
     // Error if buffer size is to small
     if (result.length() + 1 > bufferSize) {
-        returnStatus(StatusCodes::BUFFER_ERROR);
+        errorCallback(status(StatusCodes::BUFFER_ERROR));
+        return 0;
     }
 
     memcpy(buffer, result.c_str(), result.length() + 1);
     
     return portsCounter;
 }
+
+auto serialOnError(void (*func)(int code)) -> void {
+    errorCallback = func;
+};
+
+auto serialOnRead(void (*func)(int bytes)) -> void {
+    readCallback = func;
+};
+
+auto serialOnWrite(void (*func)(int bytes)) -> void {
+    writeCallback = func;
+};
 
 #endif

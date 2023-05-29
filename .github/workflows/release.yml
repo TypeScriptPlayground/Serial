@@ -2,17 +2,11 @@
 name: "Pre-Release"
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - 'include/**'
-      - 'src/**'
-      - '.github/workflows/release.yml'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'include/**'
       - 'src/**'
+      - '.github/workflows/release.yml'
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -69,18 +63,18 @@ jobs:
           path: ${{github.workspace}}/tmp
           
       - name: Rename linux Binary
-        run: mv ${{github.workspace}}/tmp/linux-binary/libserialport.so ${{github.workspace}}/lib/dls/linux.so
+        run: mv ${{github.workspace}}/tmp/linux-binary/libserialport.so ${{github.workspace}}/lib/bin/linux.so
         
       - name: Rename windows Binary
-        run: mv ${{github.workspace}}/tmp/windows-binary/serialport.dll ${{github.workspace}}/lib/dls/windows.dll
+        run: mv ${{github.workspace}}/tmp/windows-binary/serialport.dll ${{github.workspace}}/lib/bin/windows.dll
         
       - run: cd ${{github.workspace}}
         
       - name: make .tar.gz file
-        run: tar -czvf lib.tar.gz ./lib
+        run: tar -czvf SerialLink-lib.tar.gz ./lib
         
       - name: make .zip
-        run: zip -r lib.zip ./lib
+        run: zip -r SerialLink-lib.zip ./lib
     
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -89,5 +83,5 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            lib.tar.gz
-            lib.zip
+            SerialLink-lib.tar.gz
+            SerialLink-lib.zip

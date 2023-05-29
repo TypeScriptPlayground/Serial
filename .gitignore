@@ -1,6 +1,5 @@
 #directories
 .vscode/
 .cache/
-.github/
 build/
 test/

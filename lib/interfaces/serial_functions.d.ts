@@ -1,36 +1,48 @@
-import { parity } from "../constants/parity.ts";
+import { Baudrate } from "../constants/baudrates.ts";
+import { DataBits } from "../constants/data_bits.ts";
+import { Parity } from "../constants/parity.ts";
+import { StopBits } from "../constants/stop_bits.ts";
 
 export interface SerialFunctions {
-    open: (
-        port : string,
-        baudrate : number,
-        dataBits : number,
-        parity : parity,
-        stopBits : number
-    ) => number,
-    close: () => number,
-    read: (
+    open : (
+        port : Uint8Array,
+        baudrate : Baudrate,
+        dataBits : DataBits,
+        parity : Parity,
+        stopBits : StopBits
+    ) => void,
+    close : () => void,
+    read : (
         buffer : Uint8Array,
         bufferSize : number,
         timeout : number,
         multiplier : number
     ) => number,
-    readUntil: (
+    readUntil : (
         buffer : Uint8Array,
         bufferSize : number,
         timeout : number,
         multiplier : number,
-        searchString : string
+        searchString : Uint8Array
     ) => number,
-    write: (
+    write : (
         buffer : Uint8Array,
         bufferSize : number,
         timeout : number,
         multiplier : number
     ) => number,
-    getAvailablePorts: (
+    getPortsInfo : (
         buffer : Uint8Array,
         bufferSize : number,
-        separator : string
-    ) => number
+        separator : Uint8Array
+    ) => number,
+    onError : (callback : (
+        code : number
+    ) => void) => void,
+    onRead : (callback : (
+        bytes : number
+    ) => void) => void,
+    onWrite : (callback : (
+        bytes : number
+    ) => void) => void
 }

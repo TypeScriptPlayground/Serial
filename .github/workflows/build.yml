@@ -1,0 +1,92 @@
+name: Build Binarys
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - '.github/workflows/build.yml'
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:    
+  build_linux:
+    name: Build linux binaries
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: linux-binary
+        path: ${{github.workspace}}/build/src/libserialport.so
+        
+  build_windows:
+    name: Build win64 binaries
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-binary
+        path: ${{github.workspace}}\build\src\Release\serialport.dll
+        
+  commit:
+    needs: [build_windows, build_linux]
+    name: Commit binaries
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+    
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          path: ${{github.workspace}}/tmp
+          
+      - name: Create bin folder if it does not exist
+        run: mkdir -p ${{github.workspace}}/lib/bin
+        
+      - name: Move and rename linux binary
+        run: mv ${{github.workspace}}/tmp/linux-binary/libserialport.so ${{github.workspace}}/lib/bin/linux.so
+        
+      - name: Move and rename windows binary
+        run: mv ${{github.workspace}}/tmp/windows-binary/serialport.dll ${{github.workspace}}/lib/bin/windows.dll
+        
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+      - name: Commit binaries
+        run: |
+          git add ${{github.workspace}}/lib/bin/*
+          git diff-index --quiet HEAD || git commit -m "Commited compiled binaries"
+          
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.RELEASE_TOKEN }}
+          branch: ${{ github.ref }}
+    

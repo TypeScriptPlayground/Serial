@@ -1,6 +1,4 @@
 import { SerialFunctions } from "./interfaces/serial_functions.d.ts";
-import { encode } from "./encode.ts";
-import { parity } from "./constants/parity.ts";
 
 export function registerSerialFunctions(
     path : string,
@@ -8,7 +6,7 @@ export function registerSerialFunctions(
     libSuffix : string
 ) : SerialFunctions {
     const serialFunctions = Deno.dlopen(`${path}/${os}.${libSuffix}`, {
-        'open': {
+        'serialOpen': {
             parameters: [
                 // Port
                 'buffer',
@@ -22,14 +20,14 @@ export function registerSerialFunctions(
                 'i32'
             ],
             // Status code
-            result: 'i32'
+            result: 'void'
         },
-        'close': {
+        'serialClose': {
             parameters: [],
             // Status code
             result: 'i32'
         },
-        'read': {
+        'serialRead': {
             parameters: [
                 // Buffer
                 'buffer',
@@ -40,10 +38,10 @@ export function registerSerialFunctions(
                 // Multiplier
                 'i32'
             ],
-            // Status code/Bytes read
+            // Bytes read
             result: 'i32'
         },
-        'readUntil': {
+        'serialReadUntil': {
             parameters: [
                 // Buffer
                 'buffer',
@@ -56,10 +54,10 @@ export function registerSerialFunctions(
                 // SearchString
                 'buffer'
             ],
-            // Status code/Bytes read
+            // Bytes read
             result: 'i32'
         },
-        'write': {
+        'serialWrite': {
             parameters: [
                 // Buffer
                 'buffer',
@@ -70,10 +68,10 @@ export function registerSerialFunctions(
                 // Multiplier
                 'i32'
             ],
-            // Status code/Bytes written
+            // Bytes written
             result: 'i32'
         },
-        'getAvailablePorts': {
+        'serialGetPortsInfo': {
             parameters: [
                 // Buffer
                 'buffer',
@@ -82,69 +80,54 @@ export function registerSerialFunctions(
                 // Separator
                 'buffer'
             ],
-            // Status code/Amount of ports
+            // Amount of ports
             result: 'i32'
+        },
+        'serialOnError': {
+            // on error callback function
+            parameters: ['function'],
+            result: 'void'
+        },
+        'serialOnRead': {
+            // on error callback function
+            parameters: ['function'],
+            result: 'void'
+        },
+        'serialOnWrite': {
+            // on error callback function
+            parameters: ['function'],
+            result: 'void'
         }
     }).symbols
-    
+
     return {
-        open: (
-            port : string,
-            baudrate : number,
-            dataBits : number,
-            parity : parity,
-            stopBits : number
-        ) : number => serialFunctions.open(
-            encode(port + '\0'),
-            baudrate,
-            dataBits,
-            parity,
-            stopBits
-        ),
-        close: () : number => serialFunctions.close(),
-        read: (
-            buffer : Uint8Array,
-            bytes : number,
-            timeout : number,
-            multiplier : number
-        ) : number => serialFunctions.read(
-            buffer,
-            bytes,
-            timeout,
-            multiplier
-        ),
-        readUntil: (
-            buffer : Uint8Array,
-            bytes : number,
-            timeout : number,
-            multiplier : number,
-            searchString : string
-        ) : number => serialFunctions.readUntil(
-            buffer,
-            bytes,
-            timeout,
-            multiplier,
-            encode(searchString + '\0')
-        ),
-        write: (
-            buffer : Uint8Array,
-            bytes : number,
-            timeout : number,
-            multiplier : number
-        ) : number => serialFunctions.write(
-            buffer,
-            bytes,
-            timeout,
-            multiplier
-        ),
-        getAvailablePorts: (
-            buffer : Uint8Array,
-            bytes : number,
-            separator : string
-        ) : number => serialFunctions.getAvailablePorts(
-            buffer,
-            bytes,
-            encode(separator + '\0')
-        )
+        open: serialFunctions.serialOpen,
+        close:  serialFunctions.serialClose,
+        read: serialFunctions.serialRead,
+        readUntil: serialFunctions.serialReadUntil,
+        write: serialFunctions.serialWrite,
+        getPortsInfo: serialFunctions.serialGetPortsInfo,
+        onError: (callback) => {
+            serialFunctions.serialOnError(new Deno.UnsafeCallback({
+                parameters: ['i32'],
+                result: "void",
+            } as const,
+            (errorCode) => {callback(errorCode)}).pointer)
+        },
+        onRead: (callback) => {
+            serialFunctions.serialOnRead(new Deno.UnsafeCallback({
+                parameters: ['i32'],
+                result: "void",
+            } as const,
+            (bytes) => {callback(bytes)}).pointer)
+        },
+        onWrite: (callback) => {
+            serialFunctions.serialOnWrite(new Deno.UnsafeCallback({
+                parameters: ['i32'],
+                result: "void",
+            } as const,
+            (bytes) => {callback(bytes)}).pointer)
+        }
     }
 }
+

@@ -1,11 +1,9 @@
 <!-- Badges -->
-[Build Win32 DLL]: https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build_windows.yml?label=Build%20Win32%20DLL&labelColor=343b42&logo=github&logoColor=959DA5 'Win32 Build'
-[Build Linux SO]: https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build_linux.yml?label=Build%20Linux%20SO&labelColor=343b42&logo=github&logoColor=959DA5 'Linux Build'
+[Build binaries]: https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build_windows.yml?label=Build%20binaries&labelColor=343b42&logo=github&logoColor=959DA5 'Build binaries'
 [Release Downloads]: https://img.shields.io/github/downloads/TypeScriptPlayground/Serial/total?label=Downloads%20&labelColor=343b42&logo=docusign&logoColor=959DA5 'Total Release Downloads'
 
 # Serial
-[![Build Win32 DLL]](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_windows.yml)
-[![Build Linux SO]](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build_linux.yml)
+[![Build binaries]](https://github.com/TypeScriptPlayground/Serial/actions/workflows/build.yml)
 [![Release Downloads]](https://github.com/TypeScriptPlayground/Serial/releases)
 
 <a href="https://deno.land"><img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain"></a>
@@ -33,10 +31,10 @@ This library provides an interface for the communication with serial devices and
 - Works on different operating systems (check [compatibility](#compatibility) for mor info).
 
 ## Compatibility
-| OS      | Tested version   | Current state |
-|---------|------------------|---------------|
-| Windows | Windows 10 (x64) | implemented   |
-| Linux   | -                | in progress   |
+| OS      | Tested version          | Current state |
+|---------|-------------------------|---------------|
+| Windows | Windows 10 (x64)        | implemented   |
+| Linux   | Ubuntu Server 22.04 LTS | implemented   |
 
 ## Possible/Known issues
 - What happens if you open multiple connections from the same instance.
@@ -45,6 +43,10 @@ This library provides an interface for the communication with serial devices and
 - Linux write currently not working
 
 ## Examples - How to use
+To use this library you need the following flags to run it:
+- `--unstable`
+- `--allow-ffi`
+
 ### Ports
 Get a list with all serial ports and their info that are currently available on your system.
 
@@ -77,17 +79,17 @@ Send data to a serial device. For exampe to an [Arduino](https://www.arduino.cc/
 
 `main.ts`
 ```typescript
-import { Serial } from "./mod.ts";
+import { Serial, baudrate } from "./mod.ts";
 
 // create new instance of a serial object
 const serial = new Serial();
 
 // open the connection
-serial.open();
+serial.open('COM1', baudrate.B9600);
 
 // encode the message to a Uint8Array
-const textToSend = 'Hello from TypeScript!'
-const encodedTextToSend = new TextEncoder().encode(textToSend)
+const textToSend = 'Hello from TypeScript!';
+const encodedTextToSend = new TextEncoder().encode(textToSend);
 
 // send the message
 serial.send(encodedTextToSend, encodedTextToSend.length);
@@ -113,13 +115,13 @@ void loop() {
 
 `main.ts`
 ```typescript
-import { Serial } from "./mod.ts";
+import { Serial, baudrate } from "./mod.ts";
 
 // create new instance of a serial object
 const serial = new Serial();
 
 // open the connection
-serial.open();
+serial.open('COM1', baudrate.B9600);
 
 // create a new buffer to store incoming bytes,
 // in this example we want to read a maximum of 100 bytes
