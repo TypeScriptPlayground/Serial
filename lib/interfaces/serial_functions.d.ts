@@ -4,15 +4,6 @@ import { Parity } from "../constants/parity.ts";
 import { StopBits } from "../constants/stop_bits.ts";
 
 export interface SerialFunctions {
-    onError : (callback : (
-        code : number
-    ) => void) => void,
-    onRead : (callback : (
-        bytes : number
-    ) => void) => void,
-    onWrite : (callback : (
-        bytes : number
-    ) => void) => void,
     open : (
         port : Uint8Array,
         baudrate : Baudrate,
@@ -44,5 +35,14 @@ export interface SerialFunctions {
         buffer : Uint8Array,
         bufferSize : number,
         separator : Uint8Array
-    ) => number
+    ) => number,
+    onError : (callback : (
+        code : number
+    ) => void) => void,
+    onRead : (callback : (
+        bytes : number
+    ) => void) => void,
+    onWrite : (callback : (
+        bytes : number
+    ) => void) => void
 }
