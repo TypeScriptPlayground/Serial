@@ -8,7 +8,7 @@ export function registerSerialFunctions(
     
     console.log(`${path}/${os}.${libSuffix}`);
     
-    const serialFunctions = Deno.dlopen(`${path}/${os}.${libSuffix}`, {
+    const serialFunctions = Deno.dlopen(new URL(`${import.meta.url}../../${path}/${os}.${libSuffix}`).pathname.replace(/^\//gm, ''), {
         'serialOpen': {
             parameters: [
                 // Port
