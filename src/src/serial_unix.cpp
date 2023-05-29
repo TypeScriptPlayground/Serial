@@ -12,17 +12,15 @@
 int hSerialPort;
 termios2 tty;
 
-void (*callback)(int code);
+void (*errorCallback)(int errorCode);
+void (*readCallback)(int bytes);
+void (*writeCallback)(int bytes);
 
 namespace helper {
     void Callback(StatusCodes errorCode){        
         static std::string msg = "";
         callback(status(errorCode));
     }
-}
-
-void serialOnError(void (*func)(int code)){
-    callback = func;
 }
 
 void serialOpen(
