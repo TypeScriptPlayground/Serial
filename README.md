@@ -31,10 +31,10 @@ This library provides an interface for the communication with serial devices and
 - Works on different operating systems (check [compatibility](#compatibility) for mor info).
 
 ## Compatibility
-| OS      | Tested version   | Current state |
-|---------|------------------|---------------|
-| Windows | Windows 10 (x64) | implemented   |
-| Linux   | -                | in progress   |
+| OS      | Tested version          | Current state |
+|---------|-------------------------|---------------|
+| Windows | Windows 10 (x64)        | implemented   |
+| Linux   | Ubuntu Server 22.04 LTS | in progress   |
 
 ## Possible/Known issues
 - What happens if you open multiple connections from the same instance.
