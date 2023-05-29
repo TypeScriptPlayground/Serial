@@ -1,4 +1,3 @@
-#include <algorithm>
 #if defined(__unix__) || defined(__unix) || defined(__APPLE__)
 #include "serial.h"
 #include <fstream>
@@ -8,15 +7,11 @@
 #include <asm/termbits.h>
 #include <cerrno>
 #include <cstring>
-// #include <filesystem>
-
-
-// namespace fs = std::filesystem;
+#include <dirent.h>
 
 int hSerialPort;
 termios2 tty;
-
-std::ofstream logging("log.log", std::ios::out);
+std::string data;
 
 void (*errorCallback)(int errorCode);
 void (*readCallback)(int bytes);
@@ -155,7 +150,7 @@ auto serialRead(
 
     tty.c_cc[VMIN] = bufferSize;
 
-    if (ioctl(hSerialPort, TCSETS2, &tty) == -1){
+    if (ioctl(hSerialPort, TCSETS2, &tty) == -1) {
         errorCallback(status(StatusCodes::SET_STATE_ERROR));
         return 0;
     }
@@ -177,7 +172,31 @@ auto serialReadUntil(
     const int multiplier,
     void* searchString
 ) -> int {
-    return 0;
+
+    data = "";
+
+    for (int i{0}; i < bufferSize && data.find(std::string(static_cast<char*>(searchString))) == std::string::npos; i++) {
+        char bufferChar[1];
+
+        // Error if read fails
+        int bytesRead = read(hSerialPort, static_cast<char*>(bufferChar), 1);
+        if (bytesRead == -1) {
+            errorCallback(status(StatusCodes::READ_ERROR));
+            return 0;
+        }
+
+        if (bytesRead == 0) {
+            break;
+        }
+
+        data.append(std::string(bufferChar, bytesRead));
+    }
+
+    memcpy(buffer, data.c_str(), data.length() + 1);
+
+    readCallback(data.length());
+    
+    return data.length();
 }
 
 auto serialWrite(
@@ -191,12 +210,13 @@ auto serialWrite(
 
     int bytesWritten = write(hSerialPort, tmp, bufferSize);
 
-    if (bytesWritten >= 0){
-        return bytesWritten;
+    if (bytesWritten == -1) {
+        errorCallback(status(StatusCodes::WRITE_ERROR));
+        return 0;
     }
-
-    errorCallback(status(StatusCodes::WRITE_ERROR));
-    return 0;
+    
+    writeCallback(bytesWritten);
+    return bytesWritten;
 }
 
 auto serialOnError(void (*func)(int code)) -> void {
@@ -212,44 +232,45 @@ auto serialOnWrite(void (*func)(int bytes)) -> void {
 };
 
 auto serialGetPortsInfo(void *buffer, const int bufferSize, void *separator) -> int {
-    return 0;
+    std::string result = "";
+
+    int portsCounter = 0;
+
+    DIR* dir = opendir("/dev/serial/by-id");
+    if (dir == nullptr) {
+        // Handle directory not found error
+        return -1; // Return an appropriate error code or define your own
+    }
+
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != nullptr) {
+        if (entry->d_type == DT_LNK) {
+            std::string symlinkPath = "/dev/serial/by-id/";
+            symlinkPath += entry->d_name;
+
+            char canonicalPath[PATH_MAX];
+            if (realpath(symlinkPath.c_str(), canonicalPath) != nullptr) {
+                result += std::string(canonicalPath) + std::string(static_cast<char*>(separator));
+                portsCounter++;
+            }
+        }
+    }
+
+    closedir(dir);
+
+    // Remove last trailing comma
+    if (result.length() > 0) {
+        result.erase(result.length() - 1);
+    }
+
+    if (result.length() + 1 <= bufferSize) {
+        memcpy(buffer, result.c_str(), result.length() + 1);
+    } else {
+        errorCallback(status(StatusCodes::BUFFER_ERROR));
+        return 0;
+    }
+
+    return portsCounter;
 }
-
-// auto getPortsInfoUnix(
-//     void* buffer,
-//     const int bufferSize,
-//     void* separator
-// ) -> int {
-//     std::string result;
-
-//     int portsCounter = 0;
-
-//     fs::path p("/dev/serial/by-id");
-    
-//     try {
-//         if (!exists(p)) {
-//             returnStatus(StatusCodes::NOT_FOUND_ERROR);
-//         }
-        
-//         else {
-//             for (auto de : fs::directory_iterator(p)) {
-//                 if (is_symlink(de.symlink_status())) {
-//                     fs::path symlink_points_at = read_symlink(de);
-//                     fs::path canonical_path = fs::canonical(p / symlink_points_at);
-//                     result += canonical_path.generic_string().append(std::string(static_cast<char*>(separator)));
-//                     portsCounter++;
-//                 }
-//             }
-//         }
-//     } catch (const fs::filesystem_error &exeption) {
-//     }
-
-//     if (result.length() + 1 <= bufferSize){
-//         memcpy(buffer, result.c_str(), result.length() + 1);
-//     } else {
-//         returnStatus(StatusCodes::BUFFER_ERROR);
-//     }
-//     return portsCounter;
-// }
 
 #endif

@@ -50,6 +50,7 @@ void serialOpen(
         }
 
         errorCallback(status(StatusCodes::GET_STATE_ERROR));
+
         return;
     }
 
