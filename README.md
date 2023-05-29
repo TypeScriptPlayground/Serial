@@ -34,7 +34,7 @@ This library provides an interface for the communication with serial devices and
 | OS      | Tested version          | Current state |
 |---------|-------------------------|---------------|
 | Windows | Windows 10 (x64)        | implemented   |
-| Linux   | Ubuntu Server 22.04 LTS | in progress   |
+| Linux   | Ubuntu Server 22.04 LTS | implemented   |
 
 ## Possible/Known issues
 - What happens if you open multiple connections from the same instance.
