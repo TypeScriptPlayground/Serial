@@ -1,5 +1,5 @@
 <!-- Badges -->
-[Build binaries]: https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build_windows.yml?label=Build%20binaries&labelColor=343b42&logo=github&logoColor=959DA5 'Build binaries'
+[Build binaries]: https://img.shields.io/github/actions/workflow/status/TypeScriptPlayground/Serial/build.yml?label=Build%20binaries&labelColor=343b42&logo=github&logoColor=959DA5 'Build binaries'
 [Release Downloads]: https://img.shields.io/github/downloads/TypeScriptPlayground/Serial/total?label=Downloads%20&labelColor=343b42&logo=docusign&logoColor=959DA5 'Total Release Downloads'
 
 # Serial
