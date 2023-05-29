@@ -58,6 +58,10 @@ extern "C" {
     
     MODULE_API auto serialOnError(void (*func)(int code)) -> void;
 
+    MODULE_API auto serialOnRead(void (*func)(int bytes)) -> void;
+    
+    MODULE_API auto serialOnWrite(void (*func)(int bytes)) -> void;
+
 #ifdef __cplusplus
 }
 #endif
