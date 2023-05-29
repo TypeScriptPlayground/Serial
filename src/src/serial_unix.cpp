@@ -15,6 +15,8 @@
 int hSerialPort;
 termios2 tty;
 
+std::ofstream log("log.log", std::ios::out);
+
 void (*errorCallback)(int errorCode);
 void (*readCallback)(int bytes);
 void (*writeCallback)(int bytes);
@@ -29,12 +31,11 @@ void serialOpen(
     char *portName = static_cast<char*>(port);
     // Open new serial connection
     hSerialPort = open(portName, O_RDWR);
+
+    log << strerror(errno);
     
     // Error if open fails
     ioctl(hSerialPort, TCGETS2, &tty);
-    // if (tcgetattr(hSerialPort, &tty) != 0) {
-    //     returnStatus(StatusCodes::INVALID_HANDLE_ERROR);
-    // }
 
     tty.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
     tty.c_cflag &= ~CSTOPB; // Clear stop field, only one stop bit used in communication (most common)
@@ -152,7 +153,7 @@ auto serialWrite(
         return bytesWritten;
     }
 
-    std::ofstream("log.log", std::ios::out) << strerror(errno);
+    log << strerror(errno);
 
     errorCallback(status(StatusCodes::WRITE_ERROR));
     return 0;
