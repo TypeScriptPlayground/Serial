@@ -2,6 +2,8 @@ name: Build Binarys
 
 on:
   push:
+    branches:
+      - dev
     paths:
       - 'cpp/**'
       - '.github/workflows/build.yml'
