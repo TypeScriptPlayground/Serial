@@ -6,12 +6,7 @@ export function registerSerialFunctions(
     libSuffix : string
 ) : SerialFunctions {
     
-    const currentUrl = new URL(import.meta.url);
-    const parentDirectoryUrl = new URL('..', currentUrl).pathname;
-    
-    console.log(parentDirectoryUrl);
-    
-    const serialFunctions = Deno.dlopen(`${parentDirectoryUrl}/${path}/${os}.${libSuffix}`.replace(/^\//gm, ''), {
+    const serialFunctions = Deno.dlopen(new URL(`./ts/${path}/${os}.${libSuffix}`, import.meta.url), {
         'serialOpen': {
             parameters: [
                 // Port
