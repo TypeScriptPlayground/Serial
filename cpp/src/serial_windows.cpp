@@ -117,7 +117,7 @@ auto serialRead(
     }
 
     timeouts.ReadIntervalTimeout = timeout;
-    timeouts.ReadTotalTimeoutConstant = 1;
+    timeouts.ReadTotalTimeoutConstant = multiplier;
     timeouts.ReadTotalTimeoutMultiplier = multiplier;
 
     // Error if timeout set fails
@@ -152,7 +152,7 @@ auto serialReadUntil(
     }
 
     timeouts.ReadIntervalTimeout = timeout;
-    timeouts.ReadTotalTimeoutConstant = 1;
+    timeouts.ReadTotalTimeoutConstant = multiplier;
     timeouts.ReadTotalTimeoutMultiplier = multiplier;
 
     // Error if timeout set fails
