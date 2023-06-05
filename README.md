@@ -19,6 +19,13 @@ This library provides an interface for the communication with serial devices and
 >
 > This library and the documentation are still work in progress!
 
+> <picture>
+>   <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/Mqxx/GitHub-Markdown/main/blockquotes/badge/light-theme/danger.svg">
+>   <img alt="Danger" src="https://raw.githubusercontent.com/Mqxx/GitHub-Markdown/main/blockquotes/badge/dark-theme/danger.svg">
+> </picture><br>
+>
+> Currently the library does not work correctly!
+
 ## Features
 - Communication with serial devices.
 - Create multiple serial connections at the same time.
