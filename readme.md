@@ -1,0 +1,6 @@
+- [Communications Functions](https://learn.microsoft.com/en-us/windows/win32/devio/communications-functions)
+- [CreateFileA function](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea)
+- [CloseHandle function](https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle)
+- [ReadFile function](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile)
+- [WriteFile function](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile)
+- [PurgeComm function](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-purgecomm)
