@@ -22,7 +22,7 @@ auto serialOpen(
     const int dataBits,
     const int parity,
     const int stopBits
-) -> int {
+) -> int64_t {
 
     HANDLE hSerialPort;
 
