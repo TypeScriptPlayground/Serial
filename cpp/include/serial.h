@@ -22,17 +22,18 @@ extern void (*writeCallback)(int bytes);
 extern "C" {
 #endif
 
-    MODULE_API void serialOpen(
+    MODULE_API auto serialOpen(
         void* port,
         const int baudrate,
         const int dataBits,
         const int parity = 0,
         const int stopBits = 0
-    );
+    ) -> int;
 
-    MODULE_API void serialClose();
+    MODULE_API void serialClose(int64_t pointer);
 
     MODULE_API auto serialRead(
+        int64_t pointer,
         void* buffer,
         const int bufferSize,
         const int timeout,
@@ -40,6 +41,7 @@ extern "C" {
     ) -> int;
 
     MODULE_API auto serialReadUntil(
+        int64_t pointer,
         void* buffer,
         const int bufferSize,
         const int timeout,
@@ -48,6 +50,7 @@ extern "C" {
     ) -> int;
 
     MODULE_API auto serialWrite(
+        int64_t pointer,
         void* buffer,
         const int bufferSize,
         const int timeout,
