@@ -1,7 +1,5 @@
-#include <cstdint>
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #include <windows.h>
-#include <fstream>
 #include "serial.h"
 
 namespace {
@@ -9,8 +7,6 @@ DCB dcbSerialParams = {0};
 COMMTIMEOUTS timeouts = {0};
 std::string data;
 }
-
-std::ofstream outlog("log.log", std::ios::out);
 
 void (*errorCallback)(int errorCode);
 void (*readCallback)(int bytes);
@@ -93,8 +89,6 @@ auto serialOpen(
         errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
         return -1;
     }
-    outlog << "open norm:" << hSerialPort << "\n";
-    outlog << "open after:" << int64_t(hSerialPort) << "\n";
     return int64_t(hSerialPort);
 }
 
@@ -121,8 +115,7 @@ auto serialRead(
     const int timeout,
     const int multiplier
 ) -> int {
-    HANDLE hSerialPort = &pointer;
-    outlog << "read:" << int64_t(hSerialPort) << "\n";
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
 
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
@@ -160,7 +153,7 @@ auto serialReadUntil(
     const int multiplier,
     void* searchString
 ) -> int {
-    HANDLE hSerialPort = &pointer;
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
 
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
@@ -210,9 +203,7 @@ auto serialWrite(
     const int timeout,
     const int multiplier
 ) -> int {
-    outlog << "write before:" << pointer << "\n";
     HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
-    outlog << "write after:" << int64_t(hSerialPort) << "\n";
 
     DWORD bytesWritten = 0;
 
