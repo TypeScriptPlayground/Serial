@@ -1,10 +1,8 @@
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #include <windows.h>
-
 #include "serial.h"
 
 namespace {
-HANDLE hSerialPort;
 DCB dcbSerialParams = {0};
 COMMTIMEOUTS timeouts = {0};
 std::string data;
@@ -14,13 +12,15 @@ void (*errorCallback)(int errorCode);
 void (*readCallback)(int bytes);
 void (*writeCallback)(int bytes);
 
-void serialOpen(
+auto serialOpen(
     void* port,
     const int baudrate,
     const int dataBits,
     const int parity,
     const int stopBits
-) {
+) -> int64_t {
+
+    HANDLE hSerialPort;
 
     char *portName = static_cast<char*>(port);
 
@@ -39,7 +39,7 @@ void serialOpen(
     // Error if open fails
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
-        return;
+        return -1;
     }
 
     // Error if configuration get fails
@@ -47,12 +47,12 @@ void serialOpen(
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
             errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
-            return;
+            return -1;
         }
 
         errorCallback(status(StatusCodes::GET_STATE_ERROR));
 
-        return;
+        return -1;
     }
 
     dcbSerialParams.BaudRate = baudrate;
@@ -65,11 +65,11 @@ void serialOpen(
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
             errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
-            return;
+            return -1;
         }
         
         errorCallback(status(StatusCodes::SET_STATE_ERROR));
-        return;
+        return -1;
     }
     
     timeouts.ReadIntervalTimeout = 50;
@@ -83,15 +83,18 @@ void serialOpen(
         // Error if close fails
         if (!CloseHandle(hSerialPort)) {
             errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
-            return;
+            return -1;
         }
 
         errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
-        return;
+        return -1;
     }
+    return int64_t(hSerialPort);
 }
 
-void serialClose() {
+void serialClose(int64_t pointer) {
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
+
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
@@ -106,11 +109,14 @@ void serialClose() {
 }
 
 auto serialRead(
+    int64_t pointer,
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier
 ) -> int {
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
+
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
@@ -140,12 +146,15 @@ auto serialRead(
 }
 
 auto serialReadUntil(
+    int64_t pointer,
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier,
     void* searchString
 ) -> int {
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
+
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
@@ -188,11 +197,13 @@ auto serialReadUntil(
 }
 
 auto serialWrite(
+    int64_t pointer,
     void* buffer,
     const int bufferSize,
     const int timeout,
     const int multiplier
 ) -> int {
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
 
     DWORD bytesWritten = 0;
 

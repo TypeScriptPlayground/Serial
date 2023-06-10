@@ -15,6 +15,7 @@ const pathToBinariesDirectory = './ts/bin';
 export class Serial {
     private _isOpen : boolean;
     private _dl : SerialFunctions;
+    private handle! : number | bigint;
 
     /**
      * Create a new instance of a serial connection.
@@ -54,13 +55,16 @@ export class Serial {
         baudrate : Baudrate,
         serialOptions? : SerialOptions
     ) : void {
-        this._dl.open(
+        this.handle = this._dl.open(
             encode(port + '\0'),
             baudrate,
             serialOptions?.dataBits || dataBits.EIGHT,
             serialOptions?.parity || parity.NONE,
             serialOptions?.stopBits || stopBits.ONE
         );
+
+        console.log(this.handle);
+        
 
         this._isOpen = true;
     }
@@ -69,7 +73,7 @@ export class Serial {
      * Closes the serial connection.
      */
     close() {
-        this._dl.close();
+        this._dl.close(this.handle);
 
         this._isOpen = false;
     }
@@ -88,7 +92,10 @@ export class Serial {
         timeout = 0,
         multiplier = 10
     ) : number {
+        console.log('read from handle:', this.handle);
+
         const result = this._dl.read(
+            this.handle,
             buffer,
             bytes,
             timeout,
@@ -117,6 +124,7 @@ export class Serial {
         searchString = '',
     ) : number {
         const result = this._dl.readUntil(
+            this.handle,
             buffer,
             bytes,
             timeout,
@@ -142,7 +150,11 @@ export class Serial {
         timeout = 0,
         multiplier = 10
     ) : number {
+        
+        console.log('write to handle:', this.handle);
+
         const result = this._dl.write(
+            this.handle,
             buffer,
             bytes,
             timeout,

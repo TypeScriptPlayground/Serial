@@ -19,13 +19,13 @@ void (*errorCallback)(int errorCode);
 void (*readCallback)(int bytes);
 void (*writeCallback)(int bytes);
 
-void serialOpen(
+auto serialOpen(
     void* port,
     const int baudrate,
     const int dataBits,
     const int parity,
     const int stopBits
-) {
+) -> int64_t {
     char *portName = static_cast<char*>(port);
     // Open new serial connection
     hSerialPort = open(portName, O_RDWR);
@@ -33,13 +33,13 @@ void serialOpen(
     // Error if open fails
     if(hSerialPort == -1){
         errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
-        return;
+        return -1;
     }
     
     // Get the current com configuration
     if(ioctl(hSerialPort, TCGETS2, &tty) == -1){
         errorCallback(status(StatusCodes::GET_STATE_ERROR));
-        return;
+        return -1;
     }
 
     tty.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
@@ -116,13 +116,13 @@ void serialOpen(
     // Save tty settings, also checking for error
     if (ioctl(hSerialPort, TCSETS2, &tty) == -1){
         errorCallback(status(StatusCodes::SET_STATE_ERROR));
-        return;
+        return -1;
     }
 
-    return;
+    return 0;
 }
 
-void serialClose() {
+void serialClose(int64_t pointer) {
     // Error if close fails
     if (close(hSerialPort) == -1) {
         errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
@@ -133,6 +133,7 @@ void serialClose() {
 }
 
 auto serialRead(
+    int64_t pointer,
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -168,6 +169,7 @@ auto serialRead(
 }
 
 auto serialReadUntil(
+    int64_t pointer,
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -202,6 +204,7 @@ auto serialReadUntil(
 }
 
 auto serialWrite(
+    int64_t pointer,
     void* buffer,
     const int bufferSize,
     const int timeout,
