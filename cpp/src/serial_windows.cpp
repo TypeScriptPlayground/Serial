@@ -93,7 +93,7 @@ auto serialOpen(
 }
 
 void serialClose(int64_t pointer) {
-    HANDLE hSerialPort = &pointer;
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
 
     // Error if handle is invalid
     if (hSerialPort == INVALID_HANDLE_VALUE) {
