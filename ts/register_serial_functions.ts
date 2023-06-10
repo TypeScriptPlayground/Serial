@@ -20,15 +20,18 @@ export function registerSerialFunctions(
                 'i32'
             ],
             // Status code
-            result: 'void'
+            result: 'i64'
         },
         'serialClose': {
-            parameters: [],
+            parameters: [
+                'i64'
+            ],
             // Status code
             result: 'i32'
         },
         'serialRead': {
             parameters: [
+                'i64',
                 // Buffer
                 'buffer',
                 // Buffer Size
@@ -43,6 +46,7 @@ export function registerSerialFunctions(
         },
         'serialReadUntil': {
             parameters: [
+                'i64',
                 // Buffer
                 'buffer',
                 // Buffer Size
@@ -59,6 +63,7 @@ export function registerSerialFunctions(
         },
         'serialWrite': {
             parameters: [
+                'i64',
                 // Buffer
                 'buffer',
                 // Buffer Size
