@@ -9,9 +9,11 @@
 #include <cstring>
 #include <dirent.h>
 
+namespace {
 int hSerialPort;
 termios2 tty;
 std::string data;
+}
 
 void (*errorCallback)(int errorCode);
 void (*readCallback)(int bytes);

@@ -3,11 +3,12 @@
 
 #include "serial.h"
 
-
+namespace {
 HANDLE hSerialPort;
 DCB dcbSerialParams = {0};
 COMMTIMEOUTS timeouts = {0};
 std::string data;
+}
 
 void (*errorCallback)(int errorCode);
 void (*readCallback)(int bytes);
