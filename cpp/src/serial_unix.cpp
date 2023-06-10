@@ -122,7 +122,7 @@ void serialOpen(
     return;
 }
 
-void serialClose() {
+void serialClose(int64_t pointer) {
     // Error if close fails
     if (close(hSerialPort) == -1) {
         errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
@@ -133,6 +133,7 @@ void serialClose() {
 }
 
 auto serialRead(
+    int64_t pointer,
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -168,6 +169,7 @@ auto serialRead(
 }
 
 auto serialReadUntil(
+    int64_t pointer,
     void* buffer,
     const int bufferSize,
     const int timeout,
@@ -202,6 +204,7 @@ auto serialReadUntil(
 }
 
 auto serialWrite(
+    int64_t pointer,
     void* buffer,
     const int bufferSize,
     const int timeout,
