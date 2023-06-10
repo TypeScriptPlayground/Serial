@@ -93,7 +93,8 @@ auto serialOpen(
         errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
         return -1;
     }
-    outlog << "open:" << int64_t(hSerialPort) << "\n";
+    outlog << "open norm:" << hSerialPort << "\n";
+    outlog << "open after:" << int64_t(hSerialPort) << "\n";
     return int64_t(hSerialPort);
 }
 
@@ -209,8 +210,9 @@ auto serialWrite(
     const int timeout,
     const int multiplier
 ) -> int {
+    outlog << "write before:" << pointer << "\n";
     HANDLE hSerialPort = &pointer;
-    outlog << "write:" << int64_t(hSerialPort) << "\n";
+    outlog << "write after:" << int64_t(hSerialPort) << "\n";
 
     DWORD bytesWritten = 0;
 
