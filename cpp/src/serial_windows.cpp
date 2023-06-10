@@ -211,7 +211,7 @@ auto serialWrite(
     const int multiplier
 ) -> int {
     outlog << "write before:" << pointer << "\n";
-    HANDLE hSerialPort = &pointer;
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
     outlog << "write after:" << int64_t(hSerialPort) << "\n";
 
     DWORD bytesWritten = 0;
