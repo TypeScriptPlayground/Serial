@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <string>
 
 #include "status_codes.h"
@@ -28,7 +29,7 @@ extern "C" {
         const int dataBits,
         const int parity = 0,
         const int stopBits = 0
-    ) -> int;
+    ) -> int64_t;
 
     MODULE_API void serialClose(int64_t pointer);
 
