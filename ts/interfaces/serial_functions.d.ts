@@ -10,15 +10,17 @@ export interface SerialFunctions {
         dataBits : DataBits,
         parity : Parity,
         stopBits : StopBits
-    ) => void,
-    close : () => void,
+    ) => number | bigint,
+    close : (handle : number | bigint) => void,
     read : (
+        handle : number | bigint,
         buffer : Uint8Array,
         bufferSize : number,
         timeout : number,
         multiplier : number
     ) => number,
     readUntil : (
+        handle : number | bigint,
         buffer : Uint8Array,
         bufferSize : number,
         timeout : number,
@@ -26,6 +28,7 @@ export interface SerialFunctions {
         searchString : Uint8Array
     ) => number,
     write : (
+        handle : number | bigint,
         buffer : Uint8Array,
         bufferSize : number,
         timeout : number,

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev
+      - testing
     paths:
       - 'cpp/**'
       - '.github/workflows/build.yml'
