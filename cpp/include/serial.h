@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string>
 
+#include "serial.h"
 #include "status_codes.h"
 
 
@@ -63,6 +64,14 @@ extern "C" {
         const int bufferSize,
         void* separator
     ) -> int;
+
+    MODULE_API void serialClearBufferIn(int64_t pointer);
+
+    MODULE_API void serialClearBufferOut(int64_t pointer);
+
+    MODULE_API void serialAbortRead(int64_t pointer);
+
+    MODULE_API void serialAbortWrite(int64_t pointer);
     
     MODULE_API auto serialOnError(void (*func)(int code)) -> void;
 

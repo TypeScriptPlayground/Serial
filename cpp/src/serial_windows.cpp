@@ -266,6 +266,43 @@ auto serialGetPortsInfo(
     return portsCounter;
 }
 
+void serialClearBufferIn(int64_t pointer) {
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
+    if (!PurgeComm(hSerialPort, PURGE_RXCLEAR)){
+        errorCallback(status(StatusCodes::CLEAR_BUFFER_IN_ERROR));
+        return;
+    }
+    return;
+}
+
+void serialClearBufferOut(int64_t pointer) {
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
+    if (!PurgeComm(hSerialPort, PURGE_TXCLEAR)){
+        errorCallback(status(StatusCodes::CLEAR_BUFFER_OUT_ERROR));
+        return;
+    }
+    return;
+}
+
+void serialAbortRead(int64_t pointer) {
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
+    if (!PurgeComm(hSerialPort, PURGE_RXABORT)){
+        errorCallback(status(StatusCodes::ABORT_READ_ERROR));
+        return;
+    }
+    return;
+}
+
+void serialAbortWrite(int64_t pointer) {
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
+    if (!PurgeComm(hSerialPort, PURGE_TXABORT)){
+        errorCallback(status(StatusCodes::ABORT_WRITE_ERROR));
+        return;
+    }
+    return;
+}
+
+
 auto serialOnError(void (*func)(int code)) -> void {
     errorCallback = func;
 };
