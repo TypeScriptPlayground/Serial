@@ -221,7 +221,8 @@ auto serialWrite(
         return 0;
     }
 
-    OVERLAPPED o{0,0,0,0};
+    OVERLAPPED o;
+    ZeroMemory(&o, sizeof(o));
     
 
     // Error if write fails
