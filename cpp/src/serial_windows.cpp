@@ -226,6 +226,8 @@ auto serialWrite(
 
     // Error if write fails
     if (!WriteFile(hSerialPort, buffer, bufferSize, &bytesWritten, &o)) {
+        DWORD dwRet = GetLastError();
+        std::cerr << dwRet << "\n";
         errorCallback(status(StatusCodes::WRITE_ERROR));
         return 0;
     }
