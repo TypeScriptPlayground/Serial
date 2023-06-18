@@ -33,7 +33,7 @@ auto serialOpen(
         0,
         NULL,
         OPEN_EXISTING,
-        FILE_ATTRIBUTE_NORMAL,
+        FILE_FLAG_OVERLAPPED,
         NULL
     );
 
@@ -307,7 +307,8 @@ auto serialTestEvent(int64_t pointer) -> bool {
     HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
 
     DWORD dwEventMask;
-    if (!SetCommMask(hSerialPort, EV_RXCHAR)) {
+    
+    if (!SetCommMask(hSerialPort, EV_BREAK | EV_RXCHAR)) {
         std::cerr << "setcommMask is fucked\n";
         return false;
     }
@@ -322,7 +323,7 @@ auto serialTestEvent(int64_t pointer) -> bool {
     }
 
     // Überprüfe das erhaltene Ereignis
-    if (dwEvent & EV_RXCHAR) {
+    if (dwEvent & EV_RXCHAR || dwEvent & EV_BREAK) {
         return true;
     }
     std::cerr << "event nicht ausgeführt\n";
