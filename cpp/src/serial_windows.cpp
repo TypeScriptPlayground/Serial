@@ -136,8 +136,10 @@ auto serialRead(
 
     DWORD bytesRead = 0;
 
+    OVERLAPPED o{0,0,0,0};
+
     // Error if read fails
-    if (!ReadFile(hSerialPort, buffer, bufferSize, &bytesRead, NULL)) {
+    if (!ReadFile(hSerialPort, buffer, bufferSize, &bytesRead, &o)) {
         errorCallback(status(StatusCodes::READ_ERROR));
         return 0;
     }
@@ -174,12 +176,14 @@ auto serialReadUntil(
 
     data = "";
 
+    OVERLAPPED o{0,0,0,0};
+
     for (int i{0}; i < bufferSize && data.find(std::string(static_cast<char*>(searchString))) == std::string::npos; i++) {
         DWORD bytesRead;
         char bufferChar[1];
 
         // Error if read fails
-        if (!ReadFile(hSerialPort, bufferChar, sizeof(bufferChar), &bytesRead, NULL)) {
+        if (!ReadFile(hSerialPort, bufferChar, sizeof(bufferChar), &bytesRead, &o)) {
             errorCallback(status(StatusCodes::READ_ERROR));
             return 0;
         }
@@ -217,8 +221,11 @@ auto serialWrite(
         return 0;
     }
 
+    OVERLAPPED o{0,0,0,0};
+    
+
     // Error if write fails
-    if (!WriteFile(hSerialPort, buffer, bufferSize, &bytesWritten, NULL)) {
+    if (!WriteFile(hSerialPort, buffer, bufferSize, &bytesWritten, &o)) {
         errorCallback(status(StatusCodes::WRITE_ERROR));
         return 0;
     }
