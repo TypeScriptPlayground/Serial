@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - dev
-      - testing
+      - add-cpp-feats
     paths:
       - 'cpp/**'
       - '.github/workflows/build.yml'
