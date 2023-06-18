@@ -227,6 +227,18 @@ auto serialWrite(
     // Error if write fails
     if (!WriteFile(hSerialPort, buffer, bufferSize, &bytesWritten, &o)) {
         DWORD dwRet = GetLastError();
+        LPSTR errorMessage = nullptr;
+        DWORD result = FormatMessageA(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+            nullptr,
+            dwRet,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            reinterpret_cast<LPSTR>(&errorMessage),
+            0,
+            nullptr
+        );
+        std::cerr << "Fehlermeldung: " << errorMessage << std::endl;
+        LocalFree(errorMessage); // Speicher freigeben
         std::cerr << dwRet << "\n";
         errorCallback(status(StatusCodes::WRITE_ERROR));
         return 0;
