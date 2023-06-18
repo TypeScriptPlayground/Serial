@@ -1,5 +1,6 @@
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #include <windows.h>
+#include <iostream>
 #include "serial.h"
 
 namespace {
@@ -300,6 +301,32 @@ void serialAbortWrite(int64_t pointer) {
         return;
     }
     return;
+}
+
+auto serialTestEvent(int64_t pointer) -> bool {
+    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
+
+    DWORD dwEventMask;
+    if (!SetCommMask(hSerialPort, EV_RXCHAR)) {
+        std::cerr << "setcommMask is fucked\n";
+        return false;
+    }
+
+    // Warte auf das Ereignis
+    DWORD dwEvent;
+
+
+    if (!WaitCommEvent(hSerialPort, &dwEvent, NULL)) {
+        std::cerr << "waitcommEvent is fucked\n";
+        return false;
+    }
+
+    // Überprüfe das erhaltene Ereignis
+    if (dwEvent & EV_RXCHAR) {
+        return true;
+    }
+    std::cerr << "event nicht ausgeführt\n";
+    return false;
 }
 
 
