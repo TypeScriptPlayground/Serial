@@ -79,8 +79,6 @@ extern "C" {
     
     MODULE_API auto serialOnWrite(void (*func)(int bytes)) -> void;
 
-    MODULE_API auto serialTestEvent(int64_t pointer) -> bool;
-
 #ifdef __cplusplus
 }
 #endif

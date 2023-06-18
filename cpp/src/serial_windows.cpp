@@ -1,6 +1,5 @@
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #include <windows.h>
-#include <iostream>
 #include "serial.h"
 
 namespace {
@@ -33,7 +32,7 @@ auto serialOpen(
         0,
         NULL,
         OPEN_EXISTING,
-        FILE_FLAG_OVERLAPPED,
+        FILE_ATTRIBUTE_NORMAL,
         NULL
     );
 
@@ -136,10 +135,8 @@ auto serialRead(
 
     DWORD bytesRead = 0;
 
-    OVERLAPPED o{0,0,0,0};
-
     // Error if read fails
-    if (!ReadFile(hSerialPort, buffer, bufferSize, &bytesRead, &o)) {
+    if (!ReadFile(hSerialPort, buffer, bufferSize, &bytesRead, NULL)) {
         errorCallback(status(StatusCodes::READ_ERROR));
         return 0;
     }
@@ -176,14 +173,12 @@ auto serialReadUntil(
 
     data = "";
 
-    OVERLAPPED o{0,0,0,0};
-
     for (int i{0}; i < bufferSize && data.find(std::string(static_cast<char*>(searchString))) == std::string::npos; i++) {
         DWORD bytesRead;
         char bufferChar[1];
 
         // Error if read fails
-        if (!ReadFile(hSerialPort, bufferChar, sizeof(bufferChar), &bytesRead, &o)) {
+        if (!ReadFile(hSerialPort, bufferChar, sizeof(bufferChar), &bytesRead, NULL)) {
             errorCallback(status(StatusCodes::READ_ERROR));
             return 0;
         }
@@ -221,26 +216,8 @@ auto serialWrite(
         return 0;
     }
 
-    OVERLAPPED o;
-    ZeroMemory(&o, sizeof(o));
-    
-
     // Error if write fails
-    if (!WriteFile(hSerialPort, buffer, bufferSize, &bytesWritten, &o)) {
-        DWORD dwRet = GetLastError();
-        LPSTR errorMessage = nullptr;
-        DWORD result = FormatMessageA(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            nullptr,
-            dwRet,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            reinterpret_cast<LPSTR>(&errorMessage),
-            0,
-            nullptr
-        );
-        std::cerr << "Fehlermeldung: " << errorMessage << std::endl;
-        LocalFree(errorMessage); // Speicher freigeben
-        std::cerr << dwRet << "\n";
+    if (!WriteFile(hSerialPort, buffer, bufferSize, &bytesWritten, NULL)) {
         errorCallback(status(StatusCodes::WRITE_ERROR));
         return 0;
     }
@@ -324,34 +301,6 @@ void serialAbortWrite(int64_t pointer) {
     }
     return;
 }
-
-auto serialTestEvent(int64_t pointer) -> bool {
-    HANDLE hSerialPort = reinterpret_cast<void*>(pointer);
-
-    DWORD dwEventMask;
-    
-    if (!SetCommMask(hSerialPort, EV_BREAK | EV_RXCHAR)) {
-        std::cerr << "setcommMask is fucked\n";
-        return false;
-    }
-
-    // Warte auf das Ereignis
-    DWORD dwEvent;
-
-
-    if (!WaitCommEvent(hSerialPort, &dwEvent, NULL)) {
-        std::cerr << "waitcommEvent is fucked\n";
-        return false;
-    }
-
-    // Überprüfe das erhaltene Ereignis
-    if (dwEvent & EV_RXCHAR || dwEvent & EV_BREAK) {
-        return true;
-    }
-    std::cerr << "event nicht ausgeführt\n";
-    return false;
-}
-
 
 auto serialOnError(void (*func)(int code)) -> void {
     errorCallback = func;
