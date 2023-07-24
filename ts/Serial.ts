@@ -28,11 +28,11 @@ export class Serial {
         });
 
         this._dl.onRead((bytes) => {
-            console.log('onRead():', bytes);
+            // console.log('onRead():', bytes);
             
         })
         this._dl.onWrite((bytes) => {
-            console.log('onWrite():', bytes);
+            // console.log('onWrite():', bytes);
         })
     }
 
@@ -63,7 +63,7 @@ export class Serial {
             serialOptions?.stopBits || stopBits.ONE
         );
 
-        console.log(this.handle);
+        // console.log(this.handle);
         
 
         this._isOpen = true;
@@ -92,7 +92,7 @@ export class Serial {
         timeout = 0,
         multiplier = 10
     ) : number {
-        console.log('read from handle:', this.handle);
+        // console.log('read from handle:', this.handle);
 
         const result = this._dl.read(
             this.handle,
@@ -151,7 +151,7 @@ export class Serial {
         multiplier = 10
     ) : number {
         
-        console.log('write to handle:', this.handle);
+        // console.log('write to handle:', this.handle);
 
         const result = this._dl.write(
             this.handle,
@@ -187,6 +187,21 @@ export class Serial {
         })
 
         return ports;
+    }
+
+    clearBufferIn() {
+        this._dl.clearBufferIn(this.handle);
+    }
+
+    clearBufferOut() {
+        this._dl.clearBufferOut(this.handle);
+    }
+
+    abortRead() {
+        this._dl.abortRead(this.handle);
+    }
+    abortWrite() {
+        this._dl.abortWrite(this.handle);
     }
 }
 

@@ -1,3 +1,5 @@
+#pragma once
+
 enum class StatusCodes {
     SUCCESS = 0,
     CLOSE_HANDLE_ERROR = -1,

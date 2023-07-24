@@ -102,6 +102,22 @@ export function registerSerialFunctions(
             // on error callback function
             parameters: ['function'],
             result: 'void'
+        },
+        'serialClearBufferIn': {
+            parameters: ['i64'],
+            result: 'void'
+        },
+        'serialClearBufferOut': {
+            parameters: ['i64'],
+            result: 'void'
+        },
+        'serialAbortRead': {
+            parameters: ['i64'],
+            result: 'void'
+        },
+        'serialAbortWrite': {
+            parameters: ['i64'],
+            result: 'void'
         }
     }).symbols
 
@@ -112,6 +128,10 @@ export function registerSerialFunctions(
         readUntil: serialFunctions.serialReadUntil,
         write: serialFunctions.serialWrite,
         getPortsInfo: serialFunctions.serialGetPortsInfo,
+        clearBufferIn: serialFunctions.serialClearBufferIn,
+        clearBufferOut: serialFunctions.serialClearBufferOut,
+        abortRead: serialFunctions.serialAbortRead,
+        abortWrite: serialFunctions.serialAbortWrite,
         onError: (callback) => {
             serialFunctions.serialOnError(new Deno.UnsafeCallback({
                 parameters: ['i32'],

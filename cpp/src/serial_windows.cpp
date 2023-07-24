@@ -1,9 +1,12 @@
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
 #include <windows.h>
 #include "serial.h"
+#include "error/error.h"
+#include "error/init_comm_state_errors.h"
+#include "error/init_timeouts_errors.h"
+#include "error/open_errors.h"
 
 namespace {
-DCB dcbSerialParams = {0};
 COMMTIMEOUTS timeouts = {0};
 std::string data;
 }
@@ -12,19 +15,65 @@ void (*errorCallback)(int errorCode);
 void (*readCallback)(int bytes);
 void (*writeCallback)(int bytes);
 
-auto serialOpen(
-    void* port,
+auto serialInitCommState(
+    int64_t handle,
     const int baudrate,
     const int dataBits,
     const int parity,
     const int stopBits
-) -> int64_t {
+) -> int {
+    HANDLE hSerialPort = reinterpret_cast<void*>(handle);
+    DCB dcbSerialParams = {0};
 
+    if (!GetCommState(hSerialPort, &dcbSerialParams)) {
+        return error(initCommStateErrors::GET_COMM_STATE);
+    }
+
+    dcbSerialParams.DCBlength = sizeof(DCB);
+    dcbSerialParams.BaudRate = baudrate;
+    dcbSerialParams.ByteSize = dataBits;
+    dcbSerialParams.Parity = static_cast<BYTE>(parity);
+    dcbSerialParams.StopBits = static_cast<BYTE>(stopBits);
+
+    if (!SetCommState(hSerialPort, &dcbSerialParams)) {
+        return error(initCommStateErrors::SET_COMM_STATE);
+    }
+
+    return 0;
+}
+
+auto serialInitTimeouts(
+    int64_t handle,
+    const int readIntervalTimeout,
+    const int readTotalTimeoutConstant,
+    const int readTotalTimeoutMultiplier,
+    const int writeTotalTimeoutConstant,
+    const int writeTotalTimeoutMultiplier
+) -> int {
+    HANDLE hSerialPort = reinterpret_cast<void*>(handle);
+    COMMTIMEOUTS timeouts = {0};
+
+    if (!GetCommTimeouts(hSerialPort, &timeouts)) {
+        return error(initTimeoutsErrors::GET_COMM_TIMEOUTS);
+    }
+    
+    timeouts.ReadIntervalTimeout = readIntervalTimeout;
+    timeouts.ReadTotalTimeoutConstant = readTotalTimeoutConstant;
+    timeouts.ReadTotalTimeoutMultiplier = writeTotalTimeoutConstant;
+    timeouts.WriteTotalTimeoutConstant = writeTotalTimeoutConstant;
+    timeouts.WriteTotalTimeoutMultiplier = writeTotalTimeoutMultiplier;
+
+    if (!SetCommTimeouts(hSerialPort, &timeouts)) {
+        return error(initTimeoutsErrors::SET_COMM_TIMEOUTS);
+    }
+
+    return 0;
+}
+
+auto serialOpen(void* port) -> int64_t {
     HANDLE hSerialPort;
 
     char *portName = static_cast<char*>(port);
-
-    dcbSerialParams.DCBlength = sizeof(DCB);
 
     hSerialPort = CreateFile(
         portName,
@@ -38,57 +87,9 @@ auto serialOpen(
 
     // Error if open fails
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        errorCallback(status(StatusCodes::INVALID_HANDLE_ERROR));
-        return -1;
+        return error(openErrors::INVALID_HANDLE);
     }
 
-    // Error if configuration get fails
-    if (!GetCommState(hSerialPort, &dcbSerialParams)) {
-        // Error if close fails
-        if (!CloseHandle(hSerialPort)) {
-            errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
-            return -1;
-        }
-
-        errorCallback(status(StatusCodes::GET_STATE_ERROR));
-
-        return -1;
-    }
-
-    dcbSerialParams.BaudRate = baudrate;
-    dcbSerialParams.ByteSize = dataBits;
-    dcbSerialParams.Parity = static_cast<BYTE>(parity);
-    dcbSerialParams.StopBits = static_cast<BYTE>(stopBits);
-
-    // Error if configuration set fails
-    if (!SetCommState(hSerialPort, &dcbSerialParams)) {
-        // Error if close fails
-        if (!CloseHandle(hSerialPort)) {
-            errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
-            return -1;
-        }
-        
-        errorCallback(status(StatusCodes::SET_STATE_ERROR));
-        return -1;
-    }
-    
-    timeouts.ReadIntervalTimeout = 50;
-    timeouts.ReadTotalTimeoutConstant = 50;
-    timeouts.ReadTotalTimeoutMultiplier = 10;
-    timeouts.WriteTotalTimeoutConstant = 50;
-    timeouts.WriteTotalTimeoutMultiplier = 10;
-
-    // Error if timeout set fails
-    if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        // Error if close fails
-        if (!CloseHandle(hSerialPort)) {
-            errorCallback(status(StatusCodes::CLOSE_HANDLE_ERROR));
-            return -1;
-        }
-
-        errorCallback(status(StatusCodes::SET_TIMEOUT_ERROR));
-        return -1;
-    }
     return int64_t(hSerialPort);
 }
 

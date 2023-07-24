@@ -47,5 +47,9 @@ export interface SerialFunctions {
     ) => void) => void,
     onWrite : (callback : (
         bytes : number
-    ) => void) => void
+    ) => void) => void,
+    clearBufferIn : (handle : number | bigint) => void,
+    clearBufferOut : (handle : number | bigint) => void,
+    abortRead : (handle : number | bigint) => void,
+    abortWrite : (handle : number | bigint) => void
 }
